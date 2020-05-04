@@ -13,6 +13,10 @@ Supported payment schemes:
 Unsupported:
 - Offline
 
+# Demo app
+----
+This git repository contains a demo app for development reference.
+
 # Usage
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
