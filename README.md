@@ -17,7 +17,13 @@ Unsupported:
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
 
-- To authorise dependency downloads, add your provided token to ´hipsAuthToken´ in ´gradle.properties´. In your build root folder, add:
+To authorise dependency downloads, add your provided token to ´hipsAuthToken´ in ´gradle.properties´. Please ask your account manager or Hips Support for your hipsAuthToken.
+
+- Add the token to $HOME/.gradle/gradle.properties 
+```
+hipsAuthToken=AUTHENTICATION_TOKEN
+```
+In your build root folder, add:
 
 ```kotlin
 allprojects {
