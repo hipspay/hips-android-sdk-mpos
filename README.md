@@ -1,4 +1,4 @@
-# Hips UI Android SDK v0.9.2
+# Hips UI Android SDK v0.9.3
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -12,13 +12,34 @@ Unsupported payment methods:
 # Usage
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
+
+- To authorise dependency downloads, add your provided token to ´hipsAuthToken´ in ´gradle.properties´. In your build root folder, add:
+
+```kotlin
+allprojects {
+    repositories {
+        ...
+        maven {
+            url "https://jitpack.io"
+            credentials { username hipsAuthToken }
+        }
+    }
+}
+```
+- Add dependencies in your apps ´build.gradle´
+
+```kotlin
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-common:LATEST-VERSION'
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-core:LATEST-VERSION'
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-ui:LATEST-VERSION'
+```
+
 - Create you own instance of HipsUI SDK.
 
 ```kotlin
     val hipsUi = HipsUiBuilder()
             .appContext(applicationContext)
             .isTestMode(true)
-            .merchantId("YOUR_MERCHANT_ID")
             .build()
 ```
 
