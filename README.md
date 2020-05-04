@@ -95,8 +95,8 @@ allprojects {
         hipsUi.startPayment(
                 activity = this,
                 priceDetails = PriceDetails(
-                        amount = 0.0, // Pass zero to show Hips Ui Keyboard
-                        vat = 0.0,
+                        amount = 1000, // Pass zero (0) to show Hips Ui Keyboard. Amount in lowest denomination 10.00 = 1000
+                        vat = 800, // Part of amount that is vat. Amount in lowest denomination 8.00 = 800
                         description = "This is a test payment",
                         currencyType = CurrencyType.USDollar
                 ),
