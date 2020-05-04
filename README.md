@@ -3,10 +3,14 @@ Hips Android SDK is a library that provides the native In-App interaction of per
 
 # Project Status
 ---
-Supported payment methods:
+Supported terminals:
+- Miura M010
+- Miura M020
+
+Supported payment schemes:
 - Cards: Visa, Mastercard
 
-Unsupported payment methods:
+Unsupported:
 - Offline
 
 # Usage
