@@ -15,7 +15,7 @@ Unsupported:
 
 # Demo app
 ----
-This git repository contains a demo app for development reference.
+This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](http://hips.com/store)
 
 # Usage
 ----
