@@ -27,6 +27,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-common:0.9.2'
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-core:0.9.2'
+    implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-ui:0.9.2'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
