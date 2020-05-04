@@ -1,4 +1,4 @@
-# Hips UI Android SDK v0.9.3
+# Hips UI Android SDK v0.9.2
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
