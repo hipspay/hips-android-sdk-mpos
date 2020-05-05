@@ -8,6 +8,7 @@ import com.hips.sdk.hips.common.exception.HipsException
 import com.hips.sdk.hips.common.model.CurrencyType
 import com.hips.sdk.hips.common.model.HipsTransactionResult
 import com.hips.sdk.hips.common.model.PriceDetails
+import com.hips.sdk.hips.common.model.TipFlow
 import com.hips.sdk.hips.common.result.HipsUiTransaction
 import com.hips.sdk.hips.ui.CallbackManager
 import com.hips.sdk.hips.ui.HipsUi
@@ -30,10 +31,9 @@ class MainActivity : AppCompatActivity() {
 
         // Create instance of HipsUi
         hipsUi = HipsUiBuilder()
-                .appContext(applicationContext)
-                .isTestMode(true)
-                .merchantId("YOUR_MERCHANT_ID")
-                .build()
+            .appContext(applicationContext)
+            .isTestMode(true)
+            .build()
 
         // Register a callback to retrieve transaction results
         hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsTransactionResult> {
@@ -48,11 +48,8 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onError(
-                    exception: HipsException?,
-                    hipsUiTransactionRequest: HipsUiTransaction.Request?
-            ) {
-                Log.v(TAG, "onError: $exception - Initiating transaction request: $hipsUiTransactionRequest")
+            override fun onError(exception: HipsException?) {
+                Log.v(TAG, "onError: $exception")
                 main_title.text = "Error: Transaction error ${exception?.message}"
             }
         })
@@ -62,30 +59,32 @@ class MainActivity : AppCompatActivity() {
         }
 
         payment_button.setOnClickListener {
+            /**
+             * PriceDetails is nullable. If no object is passed Hips Ui i will provide controls
+             * to fill in the required properties.
+             *
+             * Currently supported in SDK:
+             * - Amount via Hips Keyboard, pass 0.0 to trigger keyboard
+             * - Description
+             * - VAT
+             * - Currency
+             *
+             * @param priceDetails
+             * @param isOfflinePayment
+             * @param requestCode
+             * @param activity
+             */
             hipsUi.startPayment(
-                    activity = this,
-
-                    /**
-                     * PriceDetails is nullable. If no object is passed Hips Ui i will provide controls
-                     * to fill in the required properties.
-                     *
-                     * Currently supported in SDK:
-                     * - Amount via Hips Keyboard, pass 0.0 to trigger keyboard
-                     * - Description
-                     *
-                     * In development:
-                     * - VAT
-                     * - Currency
-                     *
-                     */
-                    //
-                    priceDetails = PriceDetails(
-                            amount = 0.0, // Pass zero to trigger Hips Ui Keyboard
-                            vat = 0.0,
-                            description = "This is a test payment",
-                            currencyType = CurrencyType.USDollar
-                    ),
-                    isOfflinePayment = false
+                priceDetails = PriceDetails(
+                    amountInCents = 0, // Pass zero to trigger Hips Ui Keyboard
+                    vatInCents = 0,
+                    description = "This is a test payment",
+                    currencyType = CurrencyType.SEKrona,
+                    tipFlow = TipFlow.TOP
+                ),
+                isOfflinePayment = false,
+                requestCode = 12345,
+                activity = this
             )
         }
     }

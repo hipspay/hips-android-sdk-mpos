@@ -1,4 +1,4 @@
-# Hips UI Android SDK v0.9.2
+# Hips UI Android SDK v0.9.3
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -15,15 +15,15 @@ Unsupported:
 
 # Demo app
 ----
-This git repository contains a demo app for development reference.
+This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](http://hips.com/store)
 
 # Usage
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
 
-To authorise dependency downloads, add your provided token to ´hipsAuthToken´ in ´gradle.properties´. Please ask your account manager or Hips Support for your hipsAuthToken.
+To authorise dependency downloads, add your provided token to `hipsAuthToken` in `gradle.properties`. Please ask your account manager or Hips Support for your hipsAuthToken.
 
-- Add the token to $HOME/.gradle/gradle.properties 
+- Add the token to $HOME/.gradle/gradle.properties or $PROJECT_ROOT/gradle.properties
 ```
 hipsAuthToken=AUTHENTICATION_TOKEN
 ```
