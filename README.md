@@ -40,7 +40,7 @@ allprojects {
     }
 }
 ```
-- Add dependencies in your apps ´build.gradle´
+- Add dependencies in your apps `build.gradle`
 
 ```kotlin
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-common:LATEST-VERSION'
@@ -72,10 +72,7 @@ allprojects {
             Log.v(TAG, "onCanceled")
         }
 
-        override fun onError(
-                exception: HipsException?,
-                hipsUiTransactionRequest: HipsUiTransaction.Request?
-        ) {
+        override fun onError(exception: HipsException?) {
             Log.v(TAG, "onError: $exception")
         }
     })
