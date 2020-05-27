@@ -80,9 +80,9 @@ allprojects {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    // 
+    // Create a new payment request with a transaction type
     val hipsTransactionRequest = HipsTransactionRequest.Payment(
-                amountInCents = 0,
+                amountInCents = 100,
                 vatInCents = 0,
                 reference = "This is a test payment",
                 transactionType = TransactionType.Purchase,
