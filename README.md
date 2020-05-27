@@ -10,8 +10,8 @@ Supported terminals:
 Supported payment schemes:
 - Cards: Visa, Mastercard
 
-Unsupported:
-- Offline
+In development:
+- Add support for `TransactionType.PreAuthorization` and `TransactionType.Capture`
 
 # Demo app
 ----
