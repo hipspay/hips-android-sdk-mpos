@@ -48,7 +48,7 @@ allprojects {
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-ui:LATEST-VERSION'
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-terminal-miura:LATEST-VERSION'
 ```
-
+## Kotlin
 ```kotlin
     // Create you own instance of HipsUI SDK. 
     val hipsUi = HipsUiBuilder()
@@ -104,7 +104,7 @@ allprojects {
         hipsUi.openSettings(this)
     }
 ```
-
+## Java
 ```java
 
     // Create you own instance of HipsUI SDK. 
