@@ -5,11 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.hips.sdk.hips.common.exception.HipsException
-import com.hips.sdk.hips.common.model.CurrencyType
-import com.hips.sdk.hips.common.model.HipsTransactionResult
-import com.hips.sdk.hips.common.model.PriceDetails
-import com.hips.sdk.hips.common.model.TipFlow
-import com.hips.sdk.hips.common.result.HipsUiTransaction
+import com.hips.sdk.hips.common.model.*
 import com.hips.sdk.hips.ui.CallbackManager
 import com.hips.sdk.hips.ui.HipsUi
 import com.hips.sdk.hips.ui.HipsUiBuilder
@@ -32,7 +28,6 @@ class MainActivity : AppCompatActivity() {
         // Create instance of HipsUi
         hipsUi = HipsUiBuilder()
             .appContext(applicationContext)
-            .isTestMode(true)
             .build()
 
         // Register a callback to retrieve transaction results
@@ -48,7 +43,10 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onError(exception: HipsException?) {
+            override fun onError(
+                exception: HipsException?,
+                hipsTransactionResult: HipsTransactionResult?
+            ) {
                 Log.v(TAG, "onError: $exception")
                 main_title.text = "Error: Transaction error ${exception?.message}"
             }
@@ -59,30 +57,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         payment_button.setOnClickListener {
-            /**
-             * PriceDetails is nullable. If no object is passed Hips Ui i will provide controls
-             * to fill in the required properties.
-             *
-             * Currently supported in SDK:
-             * - Amount via Hips Keyboard, pass 0.0 to trigger keyboard
-             * - Description
-             * - VAT
-             * - Currency
-             *
-             * @param priceDetails
-             * @param isOfflinePayment
-             * @param requestCode
-             * @param activity
-             */
-            hipsUi.startPayment(
-                priceDetails = PriceDetails(
-                    amountInCents = 0, // Pass zero to trigger Hips Ui Keyboard
+            hipsUi.startSession(
+                hipsTransactionRequest = HipsTransactionRequest.Payment(
+                    amountInCents = 0,
                     vatInCents = 0,
-                    description = "This is a test payment",
+                    reference = "This is a test payment",
+                    transactionType = TransactionType.Purchase,
                     currencyType = CurrencyType.SEKrona,
-                    tipFlow = TipFlow.TOP
+                    tipFlowType = TipFlowType.TOP,
+                    isOfflinePayment = false,
+                    isTestMode = true
                 ),
-                isOfflinePayment = false,
                 requestCode = 12345,
                 activity = this
             )
