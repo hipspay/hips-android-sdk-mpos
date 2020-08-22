@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                     reference = "This is a test payment",
                     transactionType = TransactionType.PURCHASE,
                     currencyType = CurrencyType.SEKrona,
-                    tipFlowType = TipFlowType.TOP,
+                    tipFlowType = TipFlowType.NONE,
                     isOfflinePayment = false,
                     isTestMode = true
                 ),
