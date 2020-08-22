@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                     amountInCents = 0,
                     vatInCents = 0,
                     reference = "This is a test payment",
-                    transactionType = TransactionType.Purchase,
+                    transactionType = TransactionType.PURCHASE,
                     currencyType = CurrencyType.SEKrona,
                     tipFlowType = TipFlowType.TOP,
                     isOfflinePayment = false,
