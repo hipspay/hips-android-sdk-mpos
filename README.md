@@ -10,9 +10,6 @@ Supported terminals:
 Supported payment schemes:
 - Cards: Visa, Mastercard
 
-In development:
-- Add support for `TransactionType.PreAuthorization` and `TransactionType.Capture`
-
 # Demo app
 ----
 This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](http://hips.com/store)
@@ -81,12 +78,18 @@ allprojects {
     val hipsTransactionRequest = HipsTransactionRequest.Payment(
                 amountInCents = 100,
                 vatInCents = 0,
-                reference = "This is a test payment",
+                cashbackInCents = 0,
+                currencyIso = "SEK",
                 transactionType = TransactionType.PURCHASE,
-                currencyType = CurrencyType.SEKrona,
                 tipFlowType = TipFlowType.TOP,
-                isOfflinePayment = false,
-                isTestMode = true
+                reference = "This is a test payment",
+                employeeNumber = "1234",
+                cashierToken = "", // Optional param
+                metadata1 = "", // Optional param
+                metadata2 = "", // Optional param
+                webHook = "",  // Optional param
+                isOfflinePayment = true,
+                isTestMode = testSwitch.isChecked
             )
 
     // Start a new session 
@@ -138,16 +141,20 @@ allprojects {
 
     // Create a new payment request with a transaction type
     HipsTransactionRequest hipsTransactionRequest = new HipsTransactionRequest.Payment(
-            100,
-            0,
-            0,
-            "This is a test payment",
-            "1234",
-            CurrencyType.SEKrona.INSTANCE,
-            TipFlowType.TOP,
-            TransactionType.PURCHASE,
-            false,
-             true
+            100, // amountInCents
+            0, // vatInCents
+            0, // cashbackInCents
+            "This is a test payment", // reference
+            "1234", // employeeNumber
+            null, // cashierToken, Optional
+            null, // metadata1, Optional
+            null, // metadata2, Optional
+            null, // webHook, Optional
+            "SEK", // currencyIso
+            TipFlowType.TOP, // tipFlowType
+            TransactionType.PURCHASE, // transactionType
+            false, // isOfflinePayment
+            true // isTestMode
     );
 
     // Start a new session 

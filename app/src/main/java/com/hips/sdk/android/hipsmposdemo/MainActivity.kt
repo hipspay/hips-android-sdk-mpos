@@ -53,17 +53,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         settings_button.setOnClickListener {
-            hipsUi.openSettings(this)
+            hipsUi.openSettings(activity = this)
         }
 
         payment_button.setOnClickListener {
             hipsUi.startSession(
                 hipsTransactionRequest = HipsTransactionRequest.Payment(
-                    amountInCents = 0,
+                    amountInCents = 100,
                     vatInCents = 0,
                     reference = "This is a test payment",
                     transactionType = TransactionType.PURCHASE,
-                    currencyType = CurrencyType.SEKrona,
+                    currencyIso = "SEK",
                     tipFlowType = TipFlowType.NONE,
                     isOfflinePayment = false,
                     isTestMode = true
