@@ -1,4 +1,4 @@
-# Hips UI Android SDK v0.9.21
+# Hips UI Android SDK v0.9.22
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -96,10 +96,10 @@ allprojects {
     hipsUi.startSession(
         hipsTransactionRequest = hipsTransactionRequest,
         requestCode = 12345,
-        activity = this
+        fragment = this
     )
 
-    // Launch SDK settings to setup your terminal
+    // Launch SDK settings from activity or fragment
     settings_button.setOnClickListener {
         hipsUi.openSettings(this)
     }
@@ -109,7 +109,7 @@ allprojects {
 
     // Create you own instance of HipsUI SDK. 
     HipsUi hipsUi = new HipsUiBuilder()
-             .appContext(appContext)
+             .appContext(applicationContext)
              .build();
 
     // Create a CallbackManager.Factory handler and register it with the Hips SDK
@@ -132,7 +132,7 @@ allprojects {
         }
     });
 
-    // In the activity which launched the SDK, override the `onActivityResult()` to handle the SDK result:
+    // In the activity/fragment which launched the SDK, override the `onActivityResult()` to handle the SDK result:
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
@@ -157,13 +157,20 @@ allprojects {
             true // isTestMode
     );
 
-    // Start a new session 
+    // Start a new session from actvity or fragment
     hipsUi.startSession(
             hipsTransactionRequest,
             1337,
-            activity
+            this
     );
 
-    // Launch SDK settings to setup your terminal
-    hipsUi.openSettings(activity)
+    // Launch SDK settings from activity or fragment
+    hipsUi.openSettings(this)
+
+    // Unregister callback manager
+    @Override
+    protected void onDestroyView() {
+        super.onDestroyView();
+        hipsUi.unregisterCallback(callbackManager);
+    }
 ```
