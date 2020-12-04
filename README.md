@@ -52,8 +52,10 @@ allprojects {
             .appContext(applicationContext)
             .build()
 
-    // Create a CallbackManager.Factory handler and register it with the Hips SDK
+    // Create a CallbackManager handler and register it with the Hips SDK
     val callbackManager = CallbackManager.Factory.create()
+
+    // Register CallbackManager with the Hips SDK
     hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsTransactionResult> {
         override fun onSuccess(hipsTransactionResult: HipsTransactionResult) {
             Log.v(TAG, "onSuccess: $hipsTransactionResult")
@@ -103,6 +105,12 @@ allprojects {
     settings_button.setOnClickListener {
         hipsUi.openSettings(this)
     }
+
+    // Unregister CallbackManager
+    override fun onDestroyView() {
+        super.onDestroyView()
+        hipsUi.unregisterCallback(callbackManager)
+    }
 ```
 ## Java
 ```java
@@ -112,8 +120,10 @@ allprojects {
              .appContext(applicationContext)
              .build();
 
-    // Create a CallbackManager.Factory handler and register it with the Hips SDK
+    // Create a CallbackManager handler
     CallbackManager callbackManager = CallbackManager.Factory.INSTANCE.create();
+
+    // Register CallbackManager with the Hips SDK
     hipsUi.registerCallback(callbackManager, new HipsUiCallback<HipsTransactionResult>() {
         
         @Override
@@ -167,7 +177,7 @@ allprojects {
     // Launch SDK settings from activity or fragment
     hipsUi.openSettings(this)
 
-    // Unregister callback manager
+    // Unregister CallbackManager
     @Override
     protected void onDestroyView() {
         super.onDestroyView();
