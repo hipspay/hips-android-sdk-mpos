@@ -125,14 +125,18 @@ allprojects {
 
     // Register CallbackManager with the Hips SDK
     hipsUi.registerCallback(callbackManager, new HipsUiCallback<HipsTransactionResult>() {
-            @Override
-            public void onResult(@NotNull HipsTransactionResult hipsTransactionResult) {
-
+        @Override
+        public void onResult(@NotNull HipsTransactionResult hipsTransactionResult) {
+            if (hipsTransactionResult.getTransactionApproved()) {
+                hipsTransactionResultText.setText("Approved!");
+            } else {
+                hipsTransactionResultText.setText("Declined!");
             }
-            @Override
-            public void onError(@NotNull String errorCode, @org.jetbrains.annotations.Nullable String errorMessage) {
-
-            }
+        }
+        @Override
+        public void onError(@NotNull String errorCode, @org.jetbrains.annotations.Nullable String errorMessage) {
+            hipsTransactionResultText.setText(errorCode + ":  " + errorMessage);
+        }
     });
 
     // In the activity/fragment which launched the SDK, override the `onActivityResult()` to handle the SDK result:
