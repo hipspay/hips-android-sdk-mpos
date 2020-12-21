@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.hips.sdk.hips.common.exception.HipsException
 import com.hips.sdk.hips.common.model.HipsTransactionRequest
 import com.hips.sdk.hips.common.model.HipsTransactionResult
 import com.hips.sdk.hips.common.model.TipFlowType
@@ -52,23 +51,14 @@ class MainFragment : Fragment() {
 
         // Register a callback to retrieve transaction results
         hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsTransactionResult> {
-            override fun onSuccess(hipsTransactionResult: HipsTransactionResult) {
-                Log.v(TAG, "onSuccess: $hipsTransactionResult")
-                main_title.text = "Success: $hipsTransactionResult"
+            override fun onResult(hipsTransactionResult: HipsTransactionResult) {
+                Log.v(TAG, "onResult: $hipsTransactionResult")
+                main_title.text = "onResult: $hipsTransactionResult"
             }
 
-            override fun onCanceled() {
-                Log.v(TAG, "onCanceled")
-                main_title.text = "Transaction canceled"
-
-            }
-
-            override fun onError(
-                exception: HipsException?,
-                hipsTransactionResult: HipsTransactionResult?
-            ) {
-                Log.v(TAG, "onError: $exception")
-                main_title.text = "Error: Transaction error ${exception?.message}"
+            override fun onError(errorCode: String, errorMessage: String?) {
+                Log.v(TAG, "onError: $errorCode")
+                main_title.text = "Transaction error: $errorCode $errorMessage"
             }
         })
 

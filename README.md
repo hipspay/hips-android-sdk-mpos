@@ -1,4 +1,4 @@
-# Hips UI Android SDK v0.9.22
+# Hips UI Android SDK v0.9.25
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -12,7 +12,7 @@ Supported payment schemes:
 
 # Demo app
 ----
-This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](http://hips.com/store)
+This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](https://hips.com/store)
 
 # Usage
 ----
@@ -57,16 +57,16 @@ allprojects {
 
     // Register CallbackManager with the Hips SDK
     hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsTransactionResult> {
-        override fun onSuccess(hipsTransactionResult: HipsTransactionResult) {
-            Log.v(TAG, "onSuccess: $hipsTransactionResult")
+        override fun onResult(hipsTransactionResult: HipsTransactionResult) {
+            if (hipsTransactionResult.transactionApproved) {
+                hipsTransactionResultText.text = "Approved!"
+            } else {
+                hipsTransactionResultText.text = "Declined!"
+            }
         }
 
-        override fun onCanceled() {
-            Log.v(TAG, "onCanceled")
-        }
-
-        override fun onError(exception: HipsException?) {
-            Log.v(TAG, "onError: $exception")
+        override fun onError(errorCode: String, errorMessage: String?) {
+            hipsTransactionResultText.text = "$errorCode: $errorMessage"
         }
     })
 
@@ -125,21 +125,14 @@ allprojects {
 
     // Register CallbackManager with the Hips SDK
     hipsUi.registerCallback(callbackManager, new HipsUiCallback<HipsTransactionResult>() {
-        
-        @Override
-        public void onSuccess(@NotNull HipsTransactionResult hipsTransactionResult) {
+            @Override
+            public void onResult(@NotNull HipsTransactionResult hipsTransactionResult) {
 
-        }
+            }
+            @Override
+            public void onError(@NotNull String errorCode, @org.jetbrains.annotations.Nullable String errorMessage) {
 
-        @Override
-        public void onCanceled() {
-
-        }
-
-        @Override
-        public void onError(@Nullable HipsException exception, @Nullable HipsTransactionResult hipsTransactionResult) {
-
-        }
+            }
     });
 
     // In the activity/fragment which launched the SDK, override the `onActivityResult()` to handle the SDK result:
@@ -184,3 +177,8 @@ allprojects {
         hipsUi.unregisterCallback(callbackManager);
     }
 ```
+## Transaction status
+Check status for approved or declined transactions  in `HipsTransactionResult`
+
+## Response and Error Codes
+Find all available codes at [Hips Docs](https://docs.hips.com/reference#errors)
