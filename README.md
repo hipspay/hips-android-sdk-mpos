@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Hips UI Android SDK 1.0.0
+=======
+# Hips UI Android SDK [![](https://jitpack.io/v/org.bitbucket.hipspay/hips-android-sdk-mpos.svg)](https://jitpack.io/#org.bitbucket.hipspay/hips-android-sdk-mpos)
+>>>>>>> Update README.md
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
