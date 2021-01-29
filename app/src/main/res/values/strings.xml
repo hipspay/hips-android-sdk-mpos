@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">HipsMposDemo</string>
+    <string name="demo_amount_hint">Amount</string>
+    <string name="demo_cashback_amount_hint">Cashback amount</string>
+    <string name="demo_description_hint">Reference</string>
+    <string name="demo_cashier_hint">Cashier token</string>
+    <string name="demo_non_payment_mag_swipe_text">Non Payment display text</string>
+    <string name="demo_currency">Currency</string>
+    <string name="demo_tip_flow">Tip flow</string>
+    <string name="demo_transaction_type">TransactionType</string>
+    <string name="hips_payment">Start payment</string>
+    <string name="hips_non_payment_mag_swipe">Non payment swipe</string>
+    <string name="demo_refund">Refund</string>
+    <string name="demo_capture">Capture</string>
+    <string name="demo_test">Test mode</string>
+    <string name="demo_offline">Offline mode</string>
+    <string name="demo_transaction_result">Transaction result empty</string>
+    <string name="demo_settings">Settings</string>
 </resources>
