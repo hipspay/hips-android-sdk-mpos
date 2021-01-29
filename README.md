@@ -303,6 +303,11 @@ Check status for approved or declined transactions in `HipsTransactionResult`, a
 Launch a mag swipe session by calling `hipsUi.startNonPaymentRequest()`. Provide a text string to display on your terminal.
 The SDK interacts by receiving and returning Request and Result types.
 
+```
+*** IMPORTANT! ***
+The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com 
+```
+
 - Request: `HipsNonPaymentRequest.MagSwipe`
 - Result: `HipsResult.NonPayment.HipsNonPaymentMagSwipeResult`
 
