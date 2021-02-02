@@ -137,11 +137,11 @@ allprojects {
     // Create a new payment request with a transaction type
     HipsTransactionRequest hipsTransactionRequest = new HipsTransactionRequest.Payment(
             100, // amountInCents
-            "This is a test payment", // reference
+            "1234567890", // reference (ID that will follow the transactions in reports)
             null, // cashierToken, Optional
-            null, // metadata1, Optional
+            null, // metadata1, Optional, any data you want to pass on with the transaction, example "&id=1&color=blue"
             null, // metadata2, Optional
-            null, // webHook, Optional
+            null, // webHook, Optional, must be formatted with "https://" if included
             "SEK", // currencyIso
             TipFlowType.TOP, // tipFlowType
             TransactionType.PURCHASE, // transactionType
