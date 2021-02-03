@@ -20,6 +20,16 @@ Supported payment schemes:
 ----
 This git repository contains a demo app for development reference. If you need test cards and test terminals, they can be ordered here: [Hips Store](https://hips.com/store)
 
+# Integration checklist
+Please make sure you tick all on this integration checklist to be Hips Certified.
+- Make sure you pass any reference for the payment in the reference parameter or as meta data.
+- Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
+- If you get `requiresParameterDownload` = `true` in the response object you must run `parameterUpdate()` function as soon as possible to make sure the terminal is up to date.
+- Before any transaction is performed, an activation must take place. It can be done via settings or by running the activation function.
+- Before activation can take place, the device must be bluetooth paired.
+- Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
+
+
 # Usage
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
