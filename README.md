@@ -325,7 +325,7 @@ The BIN (first 6 digits) of the non-payment card that you want to read via this 
 ```kotlin
     hipsUi.startNonPaymentRequest(
         hipsNonPaymentRequest = HipsNonPaymentRequest.MagSwipe(
-            displayText = "This is a test payment"
+            displayText = "Please swipe your bonus card"
         ),
         requestCode = 12345,
         fragment = this
