@@ -78,18 +78,33 @@ class MainFragment : Fragment() {
                         is HipsResult.Transaction -> {
                             Log.v(TAG, "onResult: ${hipsResult.hipsTransactionResult}")
                             val result = hipsResult.toString().replace(",", "\n")
-                            hipsTransactionResultText.text = result
+                            demoTransactionResultText.text = result
                         }
                         is HipsResult.NonPayment -> {
                             Log.v(TAG, "onResult: ${hipsResult.hipsNonPaymentMagSwipeResult}")
                             val result = hipsResult.toString().replace(",", "\n")
-                            hipsTransactionResultText.text = result
+                            demoTransactionResultText.text = result
+                        }
+                        is HipsResult.OfflineBatch -> {
+                            Log.v(TAG, "onResult: ${hipsResult.hipsOfflineBatchResult}")
+                            val result = hipsResult.toString().replace(",", "\n")
+                            demoTransactionResultText.text = result
+                        }
+                        is HipsResult.Activation -> {
+                            Log.v(TAG, "onResult: ${hipsResult.hipsActivationResult}")
+                            val result = hipsResult.toString().replace(",", "\n")
+                            demoTransactionResultText.text = result
+                        }
+                        is HipsResult.ParamsUpdate -> {
+                            Log.v(TAG, "onResult: ${hipsResult.hipsParamsUpdateResult}")
+                            val result = hipsResult.toString().replace(",", "\n")
+                            demoTransactionResultText.text = result
                         }
                     }
                 }
 
                 override fun onError(errorCode: String, errorMessage: String?) {
-                    hipsTransactionResultText.text = "$errorCode: $errorMessage"
+                    demoTransactionResultText.text = "$errorCode: $errorMessage"
                 }
             })
 
@@ -114,23 +129,35 @@ class MainFragment : Fragment() {
         transactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         demoTransactionList.adapter = transactionAdapter
 
-        hipsPaymentBtn.setOnClickListener {
+        demoPaymentBtn.setOnClickListener {
             launchPayment()
         }
 
-        hipsNonPaymentMagSwipeBtn.setOnClickListener {
+        demoNonPaymentMagSwipeBtn.setOnClickListener {
             launchReadMagNonPayment()
         }
 
-        hipsSettingsBtn.setOnClickListener {
+        demoSettingsBtn.setOnClickListener {
             launchSettings()
         }
 
-        hipsRefundBtn.setOnClickListener {
+        demoRefundBtn.setOnClickListener {
             launchRefundLastTransaction()
         }
-        hipsCaptureBtn.setOnClickListener {
+        demoCaptureBtn.setOnClickListener {
             launchCaptureLastTransaction()
+        }
+
+        demoActivationBtn.setOnClickListener {
+            launchActivation()
+        }
+
+        demoUpdateBtn.setOnClickListener {
+            launchParamUpdate()
+        }
+
+        demoOfflineBatchBtn.setOnClickListener {
+            launchOfflineBatch()
         }
     }
 
@@ -201,6 +228,28 @@ class MainFragment : Fragment() {
                 displayText = demoNonPaymentMagSwipeText.text.trim().toString()
             ),
             requestCode = 1340,
+            fragment = this
+        )
+    }
+
+
+    private fun launchActivation() {
+        hipsUi.activateTerminal(
+            requestCode = 1341,
+            fragment = this
+        )
+    }
+
+    private fun launchParamUpdate() {
+        hipsUi.updateTerminal(
+            requestCode = 1342,
+            fragment = this
+        )
+    }
+
+    private fun launchOfflineBatch() {
+        hipsUi.startOfflineBatchUpload(
+            requestCode = 1345,
             fragment = this
         )
     }

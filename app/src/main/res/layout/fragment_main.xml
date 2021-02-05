@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/hips_ui_margin_large"
-    android:paddingStart="@dimen/hips_ui_margin_large"
-    android:paddingEnd="@dimen/hips_ui_margin_large"
+    android:paddingTop="@dimen/demo_ui_margin_large"
+    android:paddingStart="@dimen/demo_ui_margin_large"
+    android:paddingEnd="@dimen/demo_ui_margin_large"
     tools:context=".MainActivity">
 
     <EditText
@@ -78,41 +78,40 @@
         android:id="@+id/demoCurrencyListLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/demo_currency"
+        android:text="Currency"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/demoCurrencyList"
-        app:layout_constraintEnd_toEndOf="@+id/demoCashierToken"
-        app:layout_constraintStart_toStartOf="@+id/demoNonPaymentMagSwipeText"
+        app:layout_constraintEnd_toStartOf="@+id/demoTipFlowLabel"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/demoNonPaymentMagSwipeText" />
-
-    <Spinner
-        android:id="@+id/demoCurrencyList"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dialog"
-        app:layout_constraintEnd_toEndOf="@+id/demoCurrencyListLabel"
-        app:layout_constraintStart_toStartOf="@+id/demoCurrencyListLabel"
-        app:layout_constraintTop_toBottomOf="@+id/demoCurrencyListLabel"
-        tools:listitem="@layout/support_simple_spinner_dropdown_item" />
 
     <TextView
         android:id="@+id/demoTipFlowLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/demo_tip_flow"
+        android:text="Tip flow"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@+id/demoCurrencyList"
-        app:layout_constraintStart_toStartOf="@+id/demoCurrencyList"
-        app:layout_constraintTop_toBottomOf="@+id/demoCurrencyList" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/demoCurrencyListLabel"
+        app:layout_constraintTop_toTopOf="@+id/demoCurrencyListLabel" />
+
+    <Spinner
+        android:id="@+id/demoCurrencyList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toStartOf="@+id/demoTipFlowList"
+        app:layout_constraintStart_toStartOf="@+id/demoCurrencyListLabel"
+        app:layout_constraintTop_toBottomOf="@+id/demoCurrencyListLabel"
+        tools:listitem="@layout/support_simple_spinner_dropdown_item" />
+
 
     <Spinner
         android:id="@+id/demoTipFlowList"
-        style="@style/HipsSdkText.Hint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:spinnerMode="dialog"
+        android:spinnerMode="dropdown"
         app:layout_constraintEnd_toEndOf="@+id/demoTipFlowLabel"
-        app:layout_constraintStart_toStartOf="@+id/demoTipFlowLabel"
+        app:layout_constraintStart_toEndOf="@+id/demoCurrencyList"
         app:layout_constraintTop_toBottomOf="@+id/demoTipFlowLabel"
         tools:listitem="@layout/support_simple_spinner_dropdown_item" />
 
@@ -120,123 +119,149 @@
         android:id="@+id/demoTransactionLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/demo_transaction_type"
+        android:text="TransactionType"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/demoTipFlowList"
-        app:layout_constraintEnd_toEndOf="@+id/demoTipFlowList"
-        app:layout_constraintTop_toBottomOf="@+id/demoTipFlowList" />
+        app:layout_constraintEnd_toEndOf="@+id/demoCurrencyList"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/demoCurrencyList" />
 
     <Spinner
         android:id="@+id/demoTransactionList"
-        style="@style/HipsSdkText.Hint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:spinnerMode="dialog"
-        app:layout_constraintEnd_toEndOf="@+id/demoTransactionLabel"
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toStartOf="@+id/testSwitch"
         app:layout_constraintStart_toStartOf="@+id/demoTransactionLabel"
         app:layout_constraintTop_toBottomOf="@+id/demoTransactionLabel"
         tools:listitem="@layout/support_simple_spinner_dropdown_item" />
 
     <Button
-        android:id="@+id/hipsPaymentBtn"
+        android:id="@+id/demoPaymentBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/hips_payment"
+        android:text="@string/demo_payment"
         android:visibility="visible"
-        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@+id/demoTransactionList"
-        app:layout_constraintEnd_toStartOf="@+id/hipsNonPaymentMagSwipeBtn"
-        app:layout_constraintTop_toBottomOf="@+id/testSwitch" />
+        app:layout_constraintEnd_toStartOf="@+id/demoRefundBtn"
+        app:layout_constraintTop_toBottomOf="@+id/demoTransactionList" />
 
     <Button
-        android:id="@+id/hipsNonPaymentMagSwipeBtn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/hips_non_payment_mag_swipe"
-        android:visibility="visible"
-        app:layout_constraintStart_toEndOf="@+id/hipsPaymentBtn"
-        app:layout_constraintEnd_toEndOf="@+id/demoTransactionList"
-        app:layout_constraintTop_toBottomOf="@+id/testSwitch" />
-
-    <Button
-        android:id="@+id/hipsRefundBtn"
+        android:id="@+id/demoRefundBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/demo_refund"
         android:visibility="visible"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintEnd_toStartOf="@+id/hipsCaptureBtn"
-        app:layout_constraintStart_toStartOf="@+id/hipsPaymentBtn"
-        app:layout_constraintTop_toBottomOf="@+id/hipsPaymentBtn"/>
+        app:layout_constraintEnd_toStartOf="@+id/demoCaptureBtn"
+        app:layout_constraintTop_toTopOf="@+id/demoPaymentBtn"
+        app:layout_constraintStart_toEndOf="@+id/demoPaymentBtn" />
 
     <Button
-        android:id="@+id/hipsCaptureBtn"
+        android:id="@+id/demoCaptureBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/demo_capture"
         android:visibility="visible"
-        android:layout_marginStart="10dp"
-        app:layout_constraintStart_toEndOf="@+id/hipsRefundBtn"
-        app:layout_constraintEnd_toEndOf="@+id/hipsNonPaymentMagSwipeBtn"
-        app:layout_constraintTop_toTopOf="@+id/hipsRefundBtn"/>
+        app:layout_constraintStart_toEndOf="@+id/demoRefundBtn"
+        app:layout_constraintTop_toTopOf="@+id/demoRefundBtn"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/testSwitch"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:checked="true"
-        android:text="@string/demo_test"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="@+id/demoTransactionList"
-        app:layout_constraintEnd_toStartOf="@+id/offlineSwitch"
-        app:layout_constraintTop_toBottomOf="@+id/demoTransactionList" />
+        android:text="Test Mode?"
+        app:layout_constraintEnd_toEndOf="@+id/demoTipFlowList"
+        app:layout_constraintTop_toBottomOf="@+id/demoTipFlowList" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/offlineSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:text="@string/demo_offline"
-        app:layout_constraintEnd_toEndOf="@+id/demoTransactionList"
-        app:layout_constraintStart_toEndOf="@+id/testSwitch"
-        app:layout_constraintTop_toTopOf="@+id/testSwitch" />
-
-    <TextView
-        android:id="@+id/hipsTransactionResultTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:checked="false"
+        android:text="Offline?"
+        app:layout_constraintBottom_toBottomOf="@+id/demoTransactionList"
+        app:layout_constraintEnd_toEndOf="@+id/testSwitch"/>
+
+    <Button
+        android:id="@+id/demoNonPaymentMagSwipeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/demo_non_payment_mag_swipe"
+        android:visibility="visible"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintEnd_toStartOf="@+id/demoOfflineBatchBtn"
+        app:layout_constraintStart_toStartOf="@+id/demoPaymentBtn"
+        app:layout_constraintTop_toBottomOf="@+id/demoPaymentBtn" />
+
+    <TextView
+        android:id="@+id/demoTransactionResultTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/demo_result"
         android:textAlignment="center"
         android:textStyle="bold"
-        android:text="@string/demo_transaction_result"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hipsCaptureBtn" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/demoActivationBtn"/>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hipsTransactionResultTitle"
-        app:layout_constraintBottom_toTopOf="@+id/hipsSettingsBtn">
+        app:layout_constraintTop_toBottomOf="@+id/demoTransactionResultTitle"
+        app:layout_constraintBottom_toTopOf="@+id/demoSettingsBtn">
         <TextView
-            android:id="@+id/hipsTransactionResultText"
+            android:id="@+id/demoTransactionResultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="-" />
     </ScrollView>
 
     <Button
-        android:id="@+id/hipsSettingsBtn"
-        android:layout_width="wrap_content"
+        android:id="@+id/demoOfflineBatchBtn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/demo_offline_batch"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="@+id/demoNonPaymentMagSwipeBtn"
+        app:layout_constraintStart_toEndOf="@+id/demoNonPaymentMagSwipeBtn"
+        app:layout_constraintBottom_toBottomOf="@+id/demoNonPaymentMagSwipeBtn"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/demoSettingsBtn"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/demo_settings"
         android:visibility="visible"
         android:layout_marginBottom="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/demoActivationBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/demo_sdk_ui_activate_terminal"
+        android:visibility="visible"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/demoUpdateBtn"
+        app:layout_constraintTop_toBottomOf="@+id/demoNonPaymentMagSwipeBtn"/>
+
+    <Button
+        android:id="@+id/demoUpdateBtn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/demo_sdk_ui_update_terminal"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/demoActivationBtn"
+        app:layout_constraintStart_toEndOf="@+id/demoActivationBtn"
+        app:layout_constraintBottom_toBottomOf="@+id/demoActivationBtn"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

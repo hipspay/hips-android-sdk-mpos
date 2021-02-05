@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.0.1
+# Hips UI Android SDK 1.1.0
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -12,9 +12,10 @@ Supported payment schemes:
 
 
 #### Change log
-| Version | Description            | Date     |
-|:--------|:-----------------------|:---------|
-| `1.0.1` | Offline payment hotfix | 20210129 |
+| Version | Description                                                                 | Date       |
+|:--------|:----------------------------------------------------------------------------|:-----------|
+| `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI` | 2021-02-05 |
+| `1.0.1` | Offline payment hotfix                                                      | 2021-01-29 |
 
 # Demo app
 ----
@@ -24,8 +25,8 @@ This git repository contains a demo app for development reference. If you need t
 Please make sure you tick all on this integration checklist to be Hips Certified.
 - Make sure you pass any reference for the payment in the reference parameter or as meta data.
 - Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
-- If you get `requiresParameterDownload` = `true` in the response object you must run `parameterUpdate()` function as soon as possible to make sure the terminal is up to date.
-- Before any transaction is performed, an activation must take place. It can be done via settings or by running the activation function.
+- If you get `requiresParameterDownload` = `true` in the response object you must run `HipsUi.updateTerminal()` function as soon as possible to make sure the terminal is up to date.
+- Before any transaction is performed, an activation must take place. It can be done via settings or by running `HipsUi.activateTerminal()`.
 - Before activation can take place, the device must be bluetooth paired.
 - Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
 
@@ -172,16 +173,33 @@ The SDK provides a UI to handle terminal settings. Launch Hips Settings by calli
 #### Select Default terminal
 Make sure you have paired your Terminal with your Android device. You do this via your Bluetooth settings. IMPORTANT: Your can only see paired terminals in Hips Settings Device selection
 
+Once your `Default Device` is saved, the SDK will make all connections to this device until the `Default Device` is changed. This allows you to have multiple terminals paired.
+
 #### Activate terminal
 
 Following are the steps to activate a terminal on a device.  
 IMPORTANT: Make sure the terminal has external power and is recently rebooted before continuing with activation.
 
 1. Launch Hips Settings and press ACTIVATE
-2. Upon receiving your activation code, add it with you merchant account on [https://activate.hips.com](https://activate.hips.com)
-3. Follow the instructions on hips.com and activate your terminal
-4. Return to your app and the terminal will continue with the activation process
-5. Once the activation completes, your device will be able to make authorized request to Hips API
+2. If your terminal was pre-added in your merchant account, SKIP step 3, 4 and 5.
+3. Upon receiving receiving your activation code, add it with you merchant account on [https://activate.hips.com](https://activate.hips.com)
+4. Follow the instructions on hips.com and activate your terminal
+5. Return to your app and the terminal will continue with the activation process
+6. Once the activation completes, your device will be able to make authorized request to Hips API
+
+#### Inject keys
+
+Add encryption keys to your terminal
+IMPORTANT: Make sure the terminal has external power and is recently rebooted before continuing with injection.
+
+1. Launch Hips Settings and press INJECT KEYS
+
+#### Parameter updates
+
+Update terminal with new software, parameters and merchant settings.
+IMPORTANT: Make sure the terminal has external power and is recently rebooted before continuing with updates.
+
+1. Launch Hips Settings and press UPDATES AVAILABLE / CHECK UPDATES
 
 #### Forget terminal
 
@@ -194,6 +212,7 @@ IMPORTANT: You will not be able to make any authorized requests after this actio
 
 The SDK interacts by receiving and returning Request and Result types.
 
+- Requires: `Default Device`, `TerminalApiKeyAuth`
 - Request: `HipsTransactionRequest.Payment`
 - Result: `HipsResult.Transaction.HipsTransactionResult`
 
@@ -206,7 +225,7 @@ To make a new payment, create your `HipsTransactionRequest.Payment` body.
 | `cashierToken`     | This field is reserved for HIPS                                                                                                                                                                                                                                                                                                                   | Optional |
 | `currencyIso`      | We use the ISO 4217 standard for defining currencies.                                                                                                                                                                                                                                                                                             |          |
 | `employeeNumber`   | This is a reference so you know which employee the tips belongs to or who initiated the transaction.                                                                                                                                                                                                                                              |          |
-| `isOfflinePayment` | Enabling offline payment will store the request unti                                                                                                                                                                                                                                                                                              |          |
+| `isOfflinePayment` | By enabling offline payments, the SDK will store the transactions until uploaded to HIPS servers. If network connection is available, the SDK will attempt to upload the offline transaction batch will automatically. To do this manually, read section **Offline Batch upload via SDK API**                                                     |          |
 | `isTestMode`       | LIVE or TEST mode selected                                                                                                                                                                                                                                                                                                                        |          |
 | `metadata1`        | Your metadata 1 for order (max 255 characters)                                                                                                                                                                                                                                                                                                    | Optional |
 | `metadata2`        | Your metadata 2 for order (max 255 characters)                                                                                                                                                                                                                                                                                                    | Optional |
@@ -315,9 +334,9 @@ The SDK interacts by receiving and returning Request and Result types.
 
 
 ### *** IMPORTANT! ***
-The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com 
+The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com
 
-
+- Requires: `Default Device`
 - Request: `HipsNonPaymentRequest.MagSwipe`
 - Result: `HipsResult.NonPayment.HipsNonPaymentMagSwipeResult`
 
@@ -357,6 +376,114 @@ Check status for approved or declined transactions in `HipsNonPaymentMagSwipeRes
                                 Log.v(TAG, "onResult: ${nonPaymentResult.hipsNonPaymentMagSwipeResult}")
                             }
                         }
+                    }
+                }
+            }
+
+        override fun onError(errorCode: String, errorMessage: String?) {
+            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+        }
+    })
+```
+## Offline Batch Upload via HipsUI API
+
+Trigger manual offline batch uploads by in invoking `HipsUi.startOfflineBatchUpload()`. This will upload any existing offline transactions stored in the SDK
+- Requires: `TerminalApiKeyAuth`
+- Result: `HipsResult.OfflineBatch.HipsOfflineBatchResult`
+
+| Parameter        | Description                       | Type |
+|:-----------------|:----------------------------------|:-----|
+| `accepted`       | List of accepted `transactionID`s |      |
+| `rejected`       | List of rejected `transactionID`s |      |
+| `accepted_count` | Number of accepted transactions   |      |
+| `rejected_count` | Number of rejected transactions   |      |
+
+#### Trigger Offline Batch Upload
+```kotlin
+    hipsUi.startOfflineBatchUpload(
+        requestCode = 1345,
+        fragment = this
+    )
+```
+#### Offline Batch Upload Results
+```kotlin
+    
+    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
+            override fun onResult(hipsResult: HipsResult) {
+                when (hipsResult) {
+                    is HipsResult.OfflineBatch -> {
+                        Log.v(TAG, "onResult: ${hipsResult.hipsOfflineBatchResult}")
+                    }
+                }
+            }
+
+        override fun onError(errorCode: String, errorMessage: String?) {
+            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+        }
+    })
+```
+
+## Terminal Activation via HipsUI API
+
+Launch Activation UI by in invoking `HipsUi.activateTerminal()`. Select a paired device and start the activation process.  Read more about the steps involved in section **Hips Settings - Activate terminal**
+
+- Result: `HipsResult.Activation.HipsActivationResult`
+
+| Parameter   | Description                                   | Type |
+|:------------|:----------------------------------------------|:-----|
+| `authToken` | Authentication Key Type: `TerminalApiKeyAuth` |      |
+
+#### Trigger Terminal Activation
+```kotlin
+    hipsUi.activateTerminal(
+        requestCode = 1345,
+        fragment = this
+    )
+```
+#### Terminal Activation results
+```kotlin
+    
+    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
+            override fun onResult(hipsResult: HipsResult) {
+                when (hipsResult) {
+                    is HipsResult.Activation -> {
+                        Log.v(TAG, "onResult: ${hipsResult.hipsActivationResult.authToken}")
+                    }
+                }
+            }
+
+        override fun onError(errorCode: String, errorMessage: String?) {
+            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+        }
+    })
+```
+
+## Terminal Parameter Update via HipsUI API
+
+Launch Parameter Update UI by in invoking `HipsUi.updateTerminal()`. The SDK will attempt to connect to your `Default Device`.  Read more about the steps involved in section **Hips Settings - Parameter updates**
+
+- Requires: `Default Device`, `TerminalApiKeyAuth`
+- Result: `HipsResult.ParamsUpdate.HipsParamsUpdateResult`
+
+| Parameter      | Description                                        | Type |
+|:---------------|:---------------------------------------------------|:-----|
+| `isSuccessful` | Flag for successful or updated terminal parameters |      |
+
+#### Trigger Terminal Parameter Update
+```kotlin
+    hipsUi.updateTerminal(
+        requestCode = 1345,
+        fragment = this
+    )
+```
+#### Terminal Parameter Update results
+```kotlin
+    
+    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
+            override fun onResult(hipsResult: HipsResult) {
+                when (hipsResult) {
+                    is HipsResult.ParamsUpdate -> {
+                        Log.v(TAG, "onResult: ${hipsResult.hipsParamsUpdateResult.isSuccessful}")
                     }
                 }
             }
