@@ -413,8 +413,10 @@ Launch a mag swipe session by calling `hipsUi.startNonPaymentRequest()`. Provide
 The SDK interacts by receiving and returning Request and Result types.
 
 
-### *** IMPORTANT! ***
-The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com
+
+> ### **IMPORTANT!**
+> The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. 
+> Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com
 
 - Requires: `Default Device`
 - Request: `HipsNonPaymentRequest.MagSwipe`
