@@ -23,12 +23,12 @@ This git repository contains a demo app for development reference. If you need t
 
 # Integration checklist
 Please make sure you tick all on this integration checklist to be Hips Certified.
-- [ ] Make sure you pass any reference for the payment in the reference parameter or as meta data.
-- [ ] Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
-- [ ] If you get `requiresParameterDownload` = `true` in the response object you must run `HipsUi.updateTerminal()` function as soon as possible to make sure the terminal is up to date.
-- [ ] Before any transaction is performed, an activation must take place. It can be done via settings or by running `HipsUi.activateTerminal()`.
-- [ ] Before activation can take place, the device must be bluetooth paired.
-- [ ] Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
+- [x] Make sure you pass any reference for the payment in the reference parameter or as meta data.
+- [x] Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
+- [x] If you get `requiresParameterDownload` = `true` in the response object you must run `HipsUi.updateTerminal()` function as soon as possible to make sure the terminal is up to date.
+- [x] Before any transaction is performed, an activation must take place. It can be done via settings or by running `HipsUi.activateTerminal()`.
+- [x] Before activation can take place, the device must be bluetooth paired.
+- [x] Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
 
 
 # Usage
