@@ -8,8 +8,15 @@ Supported terminals:
 - Miura M020
 
 Supported payment schemes:
-- Cards: Visa, Mastercard
+- Cards: Visa, Mastercard, Unionpay, American Express, Diners, Discover
 
+Supported methods:
+- Contact (online pin & offline pin)
+- Contactless (online pin)
+- Mag swipe (online pin)
+- ApplePay
+- Google Pay (GPay)
+- Samsung Pay
 
 #### Change log
 | Version | Description                                                                 | Date       |
