@@ -23,12 +23,12 @@ This git repository contains a demo app for development reference. If you need t
 
 # Integration checklist
 Please make sure you tick all on this integration checklist to be Hips Certified.
-- Make sure you pass any reference for the payment in the reference parameter or as meta data.
-- Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
-- If you get `requiresParameterDownload` = `true` in the response object you must run `HipsUi.updateTerminal()` function as soon as possible to make sure the terminal is up to date.
-- Before any transaction is performed, an activation must take place. It can be done via settings or by running `HipsUi.activateTerminal()`.
-- Before activation can take place, the device must be bluetooth paired.
-- Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
+- [ ] Make sure you pass any reference for the payment in the reference parameter or as meta data.
+- [ ] Make sure the data is passed to the server by logging in to the Hips dashboard and look in the API logs
+- [ ] If you get `requiresParameterDownload` = `true` in the response object you must run `HipsUi.updateTerminal()` function as soon as possible to make sure the terminal is up to date.
+- [ ] Before any transaction is performed, an activation must take place. It can be done via settings or by running `HipsUi.activateTerminal()`.
+- [ ] Before activation can take place, the device must be bluetooth paired.
+- [ ] Do not delete the app if you have stored offline transactions (`requiresTransactionUpload`) before they are posted to Hips.
 
 
 # Usage
@@ -336,6 +336,10 @@ The SDK interacts by receiving and returning Request and Result types.
 
 To make a new Refund, create your `HipsTransactionRequest.Refund` body.
 
+> A refund on an authorized payment (not captured) will result in an automatic reversal/void of the whole authorization. Also note that on POS transactions, all transactions (even purchases marked with direct capture) will be in `authorized` state for 10 minutes before they move over to `successful` state (captured). Should you do a refund during this 10 minute period, the authorization will be voided.
+> You can refund a maximum amount of the original transaction. If you don't specify the amount; the whole transaction will be refunded.
+> You can only refund if there are funds available on your merchant account.
+
 | Parameter       | Description                                                                                                                                                                                                                                                                                                                                       | Type |
 |:----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----|
 | `amountInCents` | This is the amount with vat/tax, but without tip and cashback. We express amounts in minor units according to the ISO 4217 standard. That means they are expressed in the smallest unit of currency. Examples are USD with 1000 representing $10, GBP with 500 representing £5, EUR with 50 representing €0.50 and SEK with 100 representing 1kr. |      |
@@ -372,6 +376,9 @@ The SDK interacts by receiving and returning Request and Result types.
 - Result: `HipsResult.Transaction.HipsTransactionResult`
 
 To make a new payment, create your `HipsTransactionRequest.Capture` body.
+
+> You can capture a maximum amount of the original transaction. If you want to capture a higher amount than the authorized amount; then we recommend you to refund (reverse) the original authorization and make a new authorization with the higher amount. Incremental authorizations are not yet supported byt the SDK.
+
 
 | Parameter       | Description                                                                                                                                                                                                                                                                                                                                       | Type |
 |:----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----|
