@@ -326,6 +326,79 @@ Check status for approved or declined transactions in `HipsTransactionResult`, a
         }
     })
 ```
+## Refund Payment
+
+The SDK interacts by receiving and returning Request and Result types.
+
+- Requires: `Default Device`, `TerminalApiKeyAuth`
+- Request: `HipsTransactionRequest.Refund`
+- Result: `HipsResult.Transaction.HipsTransactionResult`
+
+To make a new Refund, create your `HipsTransactionRequest.Refund` body.
+
+| Parameter       | Description                                                                                                                                                                                                                                                                                                                                       | Type |
+|:----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----|
+| `amountInCents` | This is the amount with vat/tax, but without tip and cashback. We express amounts in minor units according to the ISO 4217 standard. That means they are expressed in the smallest unit of currency. Examples are USD with 1000 representing $10, GBP with 500 representing £5, EUR with 50 representing €0.50 and SEK with 100 representing 1kr. |      |
+| `transactionId` | Payment ID, received from a Payment request                                                                                                                                                                                                                                                                                                       |      |
+| `isTestMode`    | Test mode enabled                                                                                                                                                                                                                                                                                                                                 |      |
+
+#### Refund Requests
+
+Pass your `HipsTransactionRequest.Refund` along with your activity or fragment to `hipsUi.startSession()` to start a new HipsUI Refund session.
+```kotlin
+    val hipsTransactionRequest = HipsTransactionRequest.Refund(
+                amountInCents = 100,
+                transactionId = "1234567890",
+                isTestMode = true
+            )
+
+    hipsUi.startSession(
+        hipsTransactionRequest = hipsTransactionRequest,
+        requestCode = 12345,
+        fragment = this
+    )
+```
+
+#### Refund Results
+A Refund session always completes by returning `HipsResult.Transaction`.  
+Check status for approved or declined transactions in `HipsTransactionResult`, all available parameters and results are listed above under Payment.
+
+## Capture Payment
+
+The SDK interacts by receiving and returning Request and Result types.
+
+- Requires: `Default Device`, `TerminalApiKeyAuth`
+- Request: `HipsTransactionRequest.Capture`
+- Result: `HipsResult.Transaction.HipsTransactionResult`
+
+To make a new payment, create your `HipsTransactionRequest.Capture` body.
+
+| Parameter       | Description                                                                                                                                                                                                                                                                                                                                       | Type |
+|:----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----|
+| `amountInCents` | This is the amount with vat/tax, but without tip and cashback. We express amounts in minor units according to the ISO 4217 standard. That means they are expressed in the smallest unit of currency. Examples are USD with 1000 representing $10, GBP with 500 representing £5, EUR with 50 representing €0.50 and SEK with 100 representing 1kr. |      |
+| `transactionId` | Payment ID, received from a Payment request                                                                                                                                                                                                                                                                                                                                                   |      |
+| `isTestMode`    | Test mode enabled                                                                                                                                                                                                                                                                                                                                 |      |
+
+#### Capture Requests
+
+Pass your `HipsTransactionRequest.Capture` along with your activity or fragment to `hipsUi.startSession()` to start a new HipsUI Payment session.
+```kotlin
+    val hipsTransactionRequest = HipsTransactionRequest.Capture(
+                amountInCents = 100,
+                transactionId = "1234567890",
+                isTestMode = true
+            )
+
+    hipsUi.startSession(
+        hipsTransactionRequest = hipsTransactionRequest,
+        requestCode = 12345,
+        fragment = this
+    )
+```
+
+#### Capture Results
+A Capture session always completes by returning `HipsResult.Transaction`.  
+Check status for approved or declined transactions in `HipsTransactionResult`, all available parameters and results are listed above under Payment.
 
 ## Make Non Payments - Loyalty cards
 
