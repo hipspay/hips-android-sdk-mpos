@@ -29,6 +29,9 @@ Supported features
 - Refunds/Reversals
 - Capture
 - Localization
+- Remote Key Injection (RKI)
+- Remote firmware update
+- Remote parameter update
 
 #### Change log
 | Version | Description                                                                 | Date       |
