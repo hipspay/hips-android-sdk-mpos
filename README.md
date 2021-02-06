@@ -10,13 +10,25 @@ Supported terminals:
 Supported payment schemes:
 - Cards: Visa, Mastercard, Unionpay, American Express, Diners, Discover
 
-Supported methods:
+Supported reading methods:
 - Contact (online pin & offline pin)
 - Contactless (online pin)
 - Mag swipe (online pin)
 - ApplePay
 - Google Pay (GPay)
 - Samsung Pay
+
+Supported features
+- Online authorizations
+- Offline authorizations (deferred authorizations)
+- Offline transaction
+- Offline PIN
+- Online PIN
+- Tip (3 different flows)
+- Loyalty card reading (magnetic)
+- Refunds/Reversals
+- Capture
+- Localization
 
 #### Change log
 | Version | Description                                                                 | Date       |
