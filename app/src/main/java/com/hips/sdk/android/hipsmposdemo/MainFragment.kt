@@ -37,7 +37,8 @@ class MainFragment : Fragment() {
         TipFlowType.NONE,
         TipFlowType.TOP,
         TipFlowType.ASK,
-        TipFlowType.TOP_CENTS
+        TipFlowType.TOP_CENTS,
+        TipFlowType.ASK_CENTS
     )
 
     private val transactionList = listOf(

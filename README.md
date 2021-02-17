@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.2.0
+# Hips UI Android SDK 1.2.4
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -24,7 +24,7 @@ Supported features
 - Offline transaction
 - Offline PIN
 - Online PIN
-- Tip (3 different flows)
+- Tip (4 different flows)
 - Loyalty card reading (magnetic)
 - Refunds/Reversals
 - Capture
@@ -36,7 +36,8 @@ Supported features
 #### Change log
 | Version | Description                                                                                                                          | Date       |
 |:--------|:-------------------------------------------------------------------------------------------------------------------------------------|:-----------|
-| `1.2.0` | Re-ordered activation flow.                                                                                                          |            |
+| `1.2.4` | Added new TipFlow type, ´ASK_WITH_CENTS´. Fixed cancellation issue in payment flow. Added minor UI improvement                       | 2021-03-18 |
+| `1.2.0` | Re-ordered activation flow.                                                                                                          | 2021-02-25 |
 | `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal() | 2021-02-17 |
 | `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI`                                                          | 2021-02-05 |
 | `1.0.1` | Offline payment hotfix                                                                                                               | 2021-01-29 |
@@ -306,7 +307,7 @@ Check status for approved or declined transactions in `HipsTransactionResult`, a
 | `merchantAddressLine1`      | Merchant location street address line 1                                                                                                                                                                                                                                                                         |      |
 | `merchantAddressLine2`      | Merchant location street address line 2                                                                                                                                                                                                                                                                         |      |
 | `merchantCity`              | Merchant location City                                                                                                                                                                                                                                                                                          |      |
-| `merchantCompanyNumber`     | Merchant Legal Business Name                                                                                                                                                                                                                                                                                    |      |
+| `merchantCompanyNumber`     | Merchant Legal Business Number                                                                                                                                                                                                                                                                                    |      |
 | `merchantCountry`           | Merchant location country code. ISO 3166-1 Alpha-2                                                                                                                                                                                                                                                              |      |
 | `merchantId`                | Merchant ID for the merchant                                                                                                                                                                                                                                                                                    |      |
 | `merchantLatitude`          | Latitude                                                                                                                                                                                                                                                                                                        |      |
