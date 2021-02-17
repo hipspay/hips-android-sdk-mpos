@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.1.0
+# Hips UI Android SDK 1.1.2
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -34,10 +34,11 @@ Supported features
 - Remote parameter update
 
 #### Change log
-| Version | Description                                                                 | Date       |
-|:--------|:----------------------------------------------------------------------------|:-----------|
-| `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI` | 2021-02-05 |
-| `1.0.1` | Offline payment hotfix                                                      | 2021-01-29 |
+| Version | Description                                                                                                                          | Date       |
+|:--------|:-------------------------------------------------------------------------------------------------------------------------------------|:-----------|
+| `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal() | 2021-02-17 |
+| `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI`                                                          | 2021-02-05 |
+| `1.0.1` | Offline payment hotfix                                                                                                               | 2021-01-29 |
 
 # Demo app
 ----
@@ -291,13 +292,14 @@ Check status for approved or declined transactions in `HipsTransactionResult`, a
 | `amountTransaction`         | Authorization amount. We express amounts in minor units according to the ISO 4217 standard.                                                                                                                                                                                                                     |      |
 | `authorizationCode`         | Card authorization code                                                                                                                                                                                                                                                                                         |      |
 | `authorizationMethod`       | ONLINE or OFFLINE                                                                                                                                                                                                                                                                                               |      |
+| `cardFingerprint`           | Unique fingerprint of the card across multiple merchants. Used to identify the specific card for bonus purposes.                                                                                                                                                                                                                                                                                                                |      |
 | `createdAt`                 | DateTime when this transaction was created in the system                                                                                                                                                                                                                                                        |      |
 | `errorCode`                 | Reason code for declines (see reference)                                                                                                                                                                                                                                                                        |      |
 | `errorMessage`              | Reason message                                                                                                                                                                                                                                                                                                  |      |
 | `merchantAddressLine1`      | Merchant location street address line 1                                                                                                                                                                                                                                                                         |      |
 | `merchantAddressLine2`      | Merchant location street address line 2                                                                                                                                                                                                                                                                         |      |
 | `merchantCity`              | Merchant location City                                                                                                                                                                                                                                                                                          |      |
-| `merchantCompanyNumber`     | Merchant Legal Business Name                                                                                                                                                                                                                                                                                                                |      |
+| `merchantCompanyNumber`     | Merchant Legal Business Name                                                                                                                                                                                                                                                                                    |      |
 | `merchantCountry`           | Merchant location country code. ISO 3166-1 Alpha-2                                                                                                                                                                                                                                                              |      |
 | `merchantId`                | Merchant ID for the merchant                                                                                                                                                                                                                                                                                    |      |
 | `merchantLatitude`          | Latitude                                                                                                                                                                                                                                                                                                        |      |
@@ -599,4 +601,12 @@ Launch Parameter Update UI by in invoking `HipsUi.updateTerminal()`. The SDK wil
 ```
 
 ## Response, Decline and Error Codes
-Find all response codes at [Hips Docs](https://docs.hips.com/reference#errors)
+Find all response codes at [Hips Docs](https://docs.hips.com/reference#errors). Below are SDK specific error codes listed:
+
+| Code                               | Reason                                                                                  |
+|:-----------------------------------|:----------------------------------------------------------------------------------------|
+| `DEFAULT_TERMINAL_NOT_FOUND_ERROR` | SDK functions that required a terminal are invoked without a paired default device set. |
+| `TERMINAL_COMMUNICATION_ERROR`     | SDK cannot establish a connection to a terminal.                                        |
+| `CANCELLED_BY_USER`                | User cancel a session.                                                                  |
+| `BLUETOOTH_DISABLED`               | Bluetooth adapter is turned off.                                                        |
+| `PARTIAL_REFUND_ERROR`             | Offline refunds require full amount.                                                    |

@@ -217,6 +217,7 @@
             android:id="@+id/demoTransactionResultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
             android:text="-" />
     </ScrollView>
 
