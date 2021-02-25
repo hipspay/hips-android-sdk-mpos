@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.1.2
+# Hips UI Android SDK 1.2.0
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -36,6 +36,7 @@ Supported features
 #### Change log
 | Version | Description                                                                                                                          | Date       |
 |:--------|:-------------------------------------------------------------------------------------------------------------------------------------|:-----------|
+| `1.2.0` | Re-ordered activation flow.                                                                                                          |            |
 | `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal() | 2021-02-17 |
 | `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI`                                                          | 2021-02-05 |
 | `1.0.1` | Offline payment hotfix                                                                                                               | 2021-01-29 |
