@@ -85,6 +85,12 @@ allprojects {
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-ui:LATEST-VERSION'
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-terminal-miura:LATEST-VERSION'
 ```
+## Proguard
+If any code obfuscation is set, add rules to keep Hips files excluded.
+```
+-keep class com.hips.** { *; }
+```
+
 ## Kotlin
 ```kotlin
     // Create you own instance of HipsUI SDK. 
