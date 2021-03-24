@@ -64,7 +64,7 @@ To enable dependency downloads, add the global token to `hipsAuthToken` in `grad
 
 - Add the token to $HOME/.gradle/gradle.properties or $PROJECT_ROOT/gradle.properties
 ```
-hipsAuthToken=AUTHENTICATION_TOKEN
+hipsAuthToken=jp_ufo1rg7cjf5qsj88qh8ouc0fn6
 ```
 In your build root folder, add:
 
