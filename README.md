@@ -60,7 +60,7 @@ Please make sure you tick all on this integration checklist to be Hips Certified
 ----
 In the example below, the SDK is initialised and setup to receive callbacks
 
-To enable dependency downloads, add the global token to `hipsAuthToken` in `gradle.properties`. Please ask your account manager or Hips Support for the hipsAuthToken.
+To enable dependency downloads, add the global token to `hipsAuthToken` in `gradle.properties`.
 
 - Add the token to $HOME/.gradle/gradle.properties or $PROJECT_ROOT/gradle.properties
 ```
