@@ -1,28 +1,28 @@
 package com.hips.sdk.android.hipsmposdemo
 
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import com.hips.sdk.hips.common.model.*
-import com.hips.sdk.hips.ui.CallbackManager
-import com.hips.sdk.hips.ui.HipsUi
-import com.hips.sdk.hips.ui.HipsUiBuilder
-import com.hips.sdk.hips.ui.HipsUiCallback
-import kotlinx.android.synthetic.main.fragment_main.*
+import com.hips.sdk.android.hipsmposdemo.databinding.FragmentMainBinding
+import com.hips.sdk.hips.common.model.HipsLoyaltyCardReadRequest
+import com.hips.sdk.hips.common.model.HipsTransactionRequest
+import com.hips.sdk.hips.common.model.TipFlowType
+import com.hips.sdk.hips.common.model.TransactionType
+import com.hips.sdk.hips.ui.internal.contracts.*
+import com.hips.sdk.hips.ui.internal.model.*
 
 class MainFragment : Fragment() {
 
-    private val TAG = this::class.java.simpleName
-
-    private lateinit var hipsUi: HipsUi
-
-    // Create a callbackManager instance
-    private val callbackManager = CallbackManager.Factory.create()
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
 
     private val currencyList = listOf(
         "EUR",
@@ -46,217 +46,267 @@ class MainFragment : Fragment() {
         TransactionType.PREAUTHORIZATION
     )
 
-    companion object {
-        fun newInstance() = MainFragment()
+    // Add Hips Payment Transaction Launcher to handle payment results
+    private val paymentTransactionLauncher = registerForActivityResult(
+        HipsUiPaymentTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiPaymentTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiPaymentTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiPaymentTransactionContractResult.Cancelled -> onCancelled()
+        }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    // Add Hips Refund Transaction Launcher to handle refund results
+    private val refundTransactionLauncher = registerForActivityResult(
+        HipsUiRefundTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiRefundTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiRefundTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiRefundTransactionContractResult.Cancelled -> onCancelled()
+        }
+    }
 
-        // Create instance of HipsUi
-        hipsUi = HipsUiBuilder()
-            .appContext(requireContext())
-            .build()
+    // Add Hips Capture Transaction Launcher to handle capture results
+    private val captureTransactionLauncher = registerForActivityResult(
+        HipsUiCaptureTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiCaptureTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiCaptureTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiCaptureTransactionContractResult.Cancelled -> onCancelled()
+        }
+    }
+
+    // Add Hips Offline batch upload Launcher to handle offline sync results
+    private val offlineBatchUploadLauncher = registerForActivityResult(
+        HipsUiOfflineBatchUploadContract()
+    ) { result ->
+        when (result) {
+            is HipsUiOfflineBatchUploadContractResult.Success -> onResult(result.formatResult())
+            is HipsUiOfflineBatchUploadContractResult.Error -> onError(result.code, result.message)
+            is HipsUiOfflineBatchUploadContractResult.Cancelled -> onCancelled()
+        }
+    }
+
+    // Add Hips Loyalty Launcher to handle loyalty card results
+    private val loyaltyLauncher = registerForActivityResult(
+        HipsUiLoyaltyContract()
+    ) { result ->
+        when (result) {
+            is HipsUiLoyaltyCardReadContractResult.Success -> onResult(result.formatResult())
+            is HipsUiLoyaltyCardReadContractResult.Error -> onError(result.code, result.message)
+            is HipsUiLoyaltyCardReadContractResult.Cancelled -> onCancelled()
+        }
+    }
+
+    // Add Hips Activate Terminal Launcher to handle activation results
+    private val activateTerminalLauncher = registerForActivityResult(
+        HipsUiActivateTerminalContract()
+    ) { result ->
+        when (result) {
+            is HipsUiActivateTerminalContractResult.Success -> onResult(result.formatResult())
+            is HipsUiActivateTerminalContractResult.Error -> onError(result.code, result.message)
+            is HipsUiActivateTerminalContractResult.Cancelled -> onCancelled()
+        }
+    }
+
+    // Add Hips Update Terminal Launcher to handle parameter update results
+    private val updateTerminalLauncher = registerForActivityResult(
+        HipsUiUpdateTerminalContract()
+    ) { result ->
+        when (result) {
+            is HipsUiUpdateTerminalContractResult.Success -> onResult(result.formatResult())
+            is HipsUiUpdateTerminalContractResult.Error -> onError(result.code, result.message)
+            is HipsUiUpdateTerminalContractResult.Cancelled -> onCancelled()
+        }
+    }
+
+    private val requestBluetooth =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // Implement permission handling
+        }
+
+    private val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            // Implement permission handling
+        }
+
+    companion object {
+        fun newInstance() = MainFragment()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Register a callback to retrieve results
-        hipsUi.registerCallback(
-            callbackManager = callbackManager,
-            hipsUiCallback = object : HipsUiCallback<HipsResult> {
-                override fun onResult(hipsResult: HipsResult) {
-
-                    when (hipsResult) {
-                        is HipsResult.Transaction -> {
-                            Log.v(TAG, "onResult: ${hipsResult.hipsTransactionResult}")
-                            val result = hipsResult.toString().replace(",", "\n")
-                            demoTransactionResultText.text = result
-                        }
-                        is HipsResult.NonPayment -> {
-                            Log.v(TAG, "onResult: ${hipsResult.hipsNonPaymentMagSwipeResult}")
-                            val result = hipsResult.toString().replace(",", "\n")
-                            demoTransactionResultText.text = result
-                        }
-                        is HipsResult.OfflineBatch -> {
-                            Log.v(TAG, "onResult: ${hipsResult.hipsOfflineBatchResult}")
-                            val result = hipsResult.toString().replace(",", "\n")
-                            demoTransactionResultText.text = result
-                        }
-                        is HipsResult.Activation -> {
-                            Log.v(TAG, "onResult: ${hipsResult.hipsActivationResult}")
-                            val result = hipsResult.toString().replace(",", "\n")
-                            demoTransactionResultText.text = result
-                        }
-                        is HipsResult.ParamsUpdate -> {
-                            Log.v(TAG, "onResult: ${hipsResult.hipsParamsUpdateResult}")
-                            val result = hipsResult.toString().replace(",", "\n")
-                            demoTransactionResultText.text = result
-                        }
-                    }
-                }
-
-                override fun onError(errorCode: String, errorMessage: String?) {
-                    demoTransactionResultText.text = "$errorCode: $errorMessage"
-                }
-            })
+        checkPermissions()
 
         val currencyAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
             currencyList.map { it })
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        demoCurrencyList.adapter = currencyAdapter
+        binding.demoCurrencyList.adapter = currencyAdapter
 
         val tipFlowAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
             tipFlowList.map { it.name })
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        demoTipFlowList.adapter = tipFlowAdapter
+        binding.demoTipFlowList.adapter = tipFlowAdapter
 
         val transactionAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
-            transactionList.map { it.type.toUpperCase() })
+            transactionList.map { it.type.uppercase() })
         transactionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        demoTransactionList.adapter = transactionAdapter
+        binding.demoTransactionList.adapter = transactionAdapter
 
-        demoPaymentBtn.setOnClickListener {
+        binding.demoPaymentBtn.setOnClickListener {
             launchPayment()
         }
 
-        demoNonPaymentMagSwipeBtn.setOnClickListener {
+        binding.demoNonPaymentMagSwipeBtn.setOnClickListener {
             launchReadMagNonPayment()
         }
 
-        demoSettingsBtn.setOnClickListener {
+        binding.demoSettingsBtn.setOnClickListener {
             launchSettings()
         }
 
-        demoRefundBtn.setOnClickListener {
+        binding.demoRefundBtn.setOnClickListener {
             launchRefundLastTransaction()
         }
-        demoCaptureBtn.setOnClickListener {
+        binding.demoCaptureBtn.setOnClickListener {
             launchCaptureLastTransaction()
         }
 
-        demoActivationBtn.setOnClickListener {
+        binding.demoActivationBtn.setOnClickListener {
             launchActivation()
         }
 
-        demoUpdateBtn.setOnClickListener {
+        binding.demoUpdateBtn.setOnClickListener {
             launchParamUpdate()
         }
 
-        demoOfflineBatchBtn.setOnClickListener {
+        binding.demoOfflineBatchBtn.setOnClickListener {
             launchOfflineBatch()
         }
     }
 
-    // Let the Callback manager handle the fragment result from Hips UI SDK
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        callbackManager.onActivityResult(requestCode, resultCode, data)
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requestMultiplePermissions.launch(arrayOf(Manifest.permission.BLUETOOTH_CONNECT))
+        } else {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requestBluetooth.launch(enableBtIntent)
+        }
     }
 
     private fun launchPayment() {
         val hipsTransactionRequest = HipsTransactionRequest.Payment(
-            amountInCents = demoAmount.text.trim().toString().toIntOrNull() ?: 0,
-            reference = demoReference.text.trim().toString(),
-            currencyIso = currencyList[demoCurrencyList.selectedItemPosition],
-            tipFlowType = tipFlowList[demoTipFlowList.selectedItemPosition],
-            transactionType = transactionList[demoTransactionList.selectedItemPosition],
-            isOfflinePayment = offlineSwitch.isChecked,
-            isTestMode = testSwitch.isChecked
+            amountInCents = binding.demoAmount.text.trim().toString().toIntOrNull() ?: 0,
+            reference = binding.demoReference.text.trim().toString(),
+            currencyIso = currencyList[binding.demoCurrencyList.selectedItemPosition],
+            tipFlowType = tipFlowList[binding.demoTipFlowList.selectedItemPosition],
+            transactionType = transactionList[binding.demoTransactionList.selectedItemPosition],
+            isOfflinePayment = binding.offlineSwitch.isChecked,
+            isTestMode = binding.testSwitch.isChecked
         )
 
-        hipsUi.startSession(
-            hipsTransactionRequest = hipsTransactionRequest,
-            requestCode = 1337,
-            fragment = this
-        )
-    }
-
-    private fun launchSettings() {
-        val cashierToken = demoCashierToken.text.trim().toString()
-
-        hipsUi.openSettings(
-            hipsSettingsRequest = HipsSettingsRequest(cashierToken = cashierToken), // Optional param
-            fragment = this
+        hipsUi.startPaymentSession(
+            paymentTransactionLauncher = paymentTransactionLauncher,
+            transactionRequest = hipsTransactionRequest,
         )
     }
 
     private fun launchRefundLastTransaction() {
         val hipsTransactionRequest = HipsTransactionRequest.Refund(
-            amountInCents = demoAmount.text.trim().toString().toIntOrNull(),
+            amountInCents = binding.demoAmount.text.trim().toString().toIntOrNull(),
             transactionId = "Use a transaction id received from a purchase or pre auth",
-            isTestMode = testSwitch.isChecked
+            isTestMode = binding.testSwitch.isChecked
         )
 
-        hipsUi.startSession(
-            hipsTransactionRequest = hipsTransactionRequest,
-            requestCode = 1338,
-            fragment = this
+        hipsUi.startRefundSession(
+            refundTransactionLauncher = refundTransactionLauncher,
+            transactionRequest = hipsTransactionRequest,
         )
     }
 
     private fun launchCaptureLastTransaction() {
         val hipsTransactionRequest = HipsTransactionRequest.Capture(
-            amountInCents = demoAmount.text.trim().toString().toIntOrNull(),
+            amountInCents = binding.demoAmount.text.trim().toString().toIntOrNull(),
             transactionId = "Use a transaction id received from a pre auth",
-            isTestMode = testSwitch.isChecked
+            isTestMode = binding.testSwitch.isChecked
         )
 
-        hipsUi.startSession(
-            hipsTransactionRequest = hipsTransactionRequest,
-            requestCode = 1339,
-            fragment = this
-        )
-    }
-
-    private fun launchReadMagNonPayment() {
-        hipsUi.startNonPaymentRequest(
-            hipsNonPaymentRequest = HipsNonPaymentRequest.MagSwipe(
-                displayText = demoNonPaymentMagSwipeText.text.trim().toString()
-            ),
-            requestCode = 1340,
-            fragment = this
-        )
-    }
-
-
-    private fun launchActivation() {
-        hipsUi.activateTerminal(
-            requestCode = 1341,
-            fragment = this
-        )
-    }
-
-    private fun launchParamUpdate() {
-        hipsUi.updateTerminal(
-            requestCode = 1342,
-            fragment = this
+        hipsUi.startCaptureSession(
+            captureTransactionLauncher = captureTransactionLauncher,
+            transactionRequest = hipsTransactionRequest,
         )
     }
 
     private fun launchOfflineBatch() {
-        hipsUi.startOfflineBatchUpload(
-            requestCode = 1345,
+        hipsUi.startOfflineBatchUploadSession(
+            offlineBatchUploadLauncher = offlineBatchUploadLauncher
+        )
+    }
+
+    private fun launchReadMagNonPayment() {
+        hipsUi.startLoyaltySession(
+            loyaltyLauncher = loyaltyLauncher,
+            loyaltyRequest = HipsLoyaltyCardReadRequest.MagSwipe(
+                displayText = binding.demoNonPaymentMagSwipeText.text.trim().toString()
+            ),
+        )
+    }
+
+    private fun launchActivation() {
+        hipsUi.startActivateTerminalSession(
+            activateTerminalLauncher = activateTerminalLauncher
+        )
+    }
+
+    private fun launchParamUpdate() {
+        hipsUi.startUpdateTerminalSession(
+            updateTerminalLauncher = updateTerminalLauncher
+        )
+    }
+
+    private fun launchSettings() {
+        hipsUi.openSettings(
             fragment = this
         )
     }
 
+    private fun onResult(result: String) {
+        binding.demoTransactionResultText.text = result
+    }
+
+    private fun onError(
+        errorCode: String,
+        errorMessage: String
+    ) {
+        binding.demoTransactionResultText.text = "$errorCode: $errorMessage"
+    }
+
+    private fun onCancelled() {
+        binding.demoTransactionResultText.text = "Cancelled"
+    }
+
+    private fun Any.formatResult(): String = toString().replace(",", "\n")
+
     override fun onDestroyView() {
         super.onDestroyView()
-        hipsUi.unregisterCallback(callbackManager)
+        _binding = null
     }
 }
