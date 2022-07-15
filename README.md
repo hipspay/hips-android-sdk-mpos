@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.2.4
+# Hips UI Android SDK 1.3.0
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -32,10 +32,12 @@ Supported features
 - Remote Key Injection (RKI)
 - Remote firmware update
 - Remote parameter update
+- Customize the Hips UI SDK theme 
 
 #### Change log
 | Version | Description                                                                                                                          | Date       |
 |:--------|:-------------------------------------------------------------------------------------------------------------------------------------|:-----------|
+| `1.3.0` | Added new Launch contracts to retrieve results from Hips UI SDK. The previous API is still available but is marked with deprecation and will be removed in future releases. Its highly recommended to implement the new API to avoid some Lifecycle related issues. Added theming support to customize the payment and loyalty views. SDK targets latest API 32. Fixed an issue where a cancellation could cause a crash. | 2022-07-15 |
 | `1.2.4` | Added new TipFlow type, ´ASK_WITH_CENTS´. Fixed cancellation issue in payment flow. Added minor UI improvement                       | 2021-03-18 |
 | `1.2.0` | Re-ordered activation flow.                                                                                                          | 2021-02-25 |
 | `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal() | 2021-02-17 |
@@ -99,103 +101,77 @@ If any code obfuscation is set, add rules to keep Hips files excluded.
             .appContext(applicationContext)
             .build()
 
-    // Create a CallbackManager handler and register it with the Hips SDK
-    val callbackManager = CallbackManager.Factory.create()
-
-    // Register CallbackManager with the Hips SDK
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.Transaction -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsTransactionResult}")
-                    }
-                    is HipsResult.NonPayment -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsNonPaymentMagSwipeResult}")
-                    }
-                }
-            }
-
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    // Add one of the available launch contracts to retrieve results back from Hips SDK
+    private val paymentTransactionLauncher = registerForActivityResult(
+        HipsUiPaymentTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiPaymentTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiPaymentTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiPaymentTransactionContractResult.Cancelled -> onCancelled()
         }
-    })
-
-    // In the activity which launched the SDK, override the `onActivityResult()` to handle the SDK result:
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        callbackManager.onActivityResult(requestCode, resultCode, data)
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
-    // Unregister CallbackManager
-    override fun onDestroyView() {
-        super.onDestroyView()
-        hipsUi.unregisterCallback(callbackManager)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.hipsPaymentBtn.setOnClickListener {
+            launchPayment()
+        }
+    }
+
+    // Start the payment session by passing the launcher and the request 
+    private fun launchPayment() {
+        val hipsTransactionRequest = HipsTransactionRequest.Payment( /* ... */ )
+    
+        hipsUi.startPaymentSession(
+            paymentTransactionLauncher = paymentTransactionLauncher,
+            transactionRequest = hipsTransactionRequest,
+        )
     }
 ```
 ## Java
 ```java
 
-    // Create you own instance of HipsUI SDK. 
+    // Create your own instance of HipsUI SDK. 
     HipsUi hipsUi = new HipsUiBuilder()
              .appContext(applicationContext)
              .build();
 
-    // Create a CallbackManager handler
-    CallbackManager callbackManager = CallbackManager.Factory.INSTANCE.create();
+    // Add one of the available launch contracts to retrieve results back from from Hips SDK
+    private final ActivityResultLauncher<HipsUiPaymentTransactionLauncherInput> paymentTransactionLauncher =
+            registerForActivityResult(new HipsUiPaymentTransactionContract(), this::renderPaymentTransactionResult);
 
-    // Register CallbackManager with the Hips SDK
-    hipsUi.registerCallback(callbackManager, new HipsUiCallback<HipsResult>() {
-        @Override
-        public void onResult(@NotNull HipsResult hipsResult) {
-            if (hipsResult instanceof HipsResult.Transaction) {
-                HipsTransactionResult hipsTransactionResult = ((HipsResult.Transaction) hipsResult).getHipsTransactionResult();
-                if (hipsTransactionResult.getTransactionApproved()) {
-                    hipsResultText.setText("Approved!");
-                } else {
-                    hipsResultText.setText("Declined!");
-                }
+    // Render the contract results
+    private void renderPaymentTransactionResult(HipsUiPaymentTransactionContractResult result) {
+        if (result instanceof HipsUiPaymentTransactionContractResult.Transaction) {
+            HipsTransactionResult hipsTransactionResult = ((HipsUiPaymentTransactionContractResult.Transaction) result).getData().getHipsTransactionResult();
+            if (hipsTransactionResult.getTransactionApproved()) {
+                Timber.d( "Approved");
+            } else {
+                Timber.d("Declined!");
             }
-
-            if (hipsResult instanceof HipsResult.NonPayment) {
-                HipsNonPaymentMagSwipeResult hipsNonPaymentMagSwipeResult = ((HipsResult.NonPayment) hipsResult).getHipsNonPaymentMagSwipeResult();
-                Log.v("MagSwipeResult Track 1", hipsNonPaymentMagSwipeResult.getTrack1());
-                Log.v("MagSwipeResult Track 2", hipsNonPaymentMagSwipeResult.getTrack2());
-                Log.v("MagSwipeResult Track 3", hipsNonPaymentMagSwipeResult.getTrack3());
-            }
+        } else if (result instanceof HipsUiPaymentTransactionContractResult.Error) {
+            HipsUiPaymentTransactionContractResult.Error hipsError = ((HipsUiPaymentTransactionContractResult.Error) result);
+            Timber.d("Hips error: %s", hipsError.getMessage());
+        } else if (result instanceof HipsUiPaymentTransactionContractResult.Cancelled) {
+            Timber.d("Cancelled");
         }
-        @Override
-        public void onError(@NotNull String errorCode, @org.jetbrains.annotations.Nullable String errorMessage) {
-            hipsResultText.setText(errorCode + ":  " + errorMessage);
-        }
-    });
-
-    // In the activity/fragment which launched the SDK, override the `onActivityResult()` to handle the SDK result:
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // Create a new payment request with a transaction type
-    HipsTransactionRequest hipsTransactionRequest = new HipsTransactionRequest.Payment(
-            100, // amountInCents
-            "1234567890", // reference (ID that will follow the transactions in reports)
-            null, // cashierToken, Optional
-            null, // metadata1, Optional, any data you want to pass on with the transaction, example "&id=1&color=blue"
-            null, // metadata2, Optional
-            null, // webHook, Optional, must be formatted with "https://" if included
-            "SEK", // currencyIso
-            TipFlowType.TOP, // tipFlowType
-            TransactionType.PURCHASE, // transactionType
-            false, // isOfflinePayment
-            true // isTestMode
-    );
-    
-    // Unregister CallbackManager
     @Override
-    protected void onDestroyView() {
-        super.onDestroyView();
-        hipsUi.unregisterCallback(callbackManager);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        button.setOnClickListener(v -> {
+            launchPaymentSession();
+        });
+    }
+
+    // Start the payment session by passing the launcher and the request 
+    private void launchPaymentSession() {
+        HipsTransactionRequest.Payment request = new HipsTransactionRequest.Payment( /* ... */ );
+        
+        hipsUi.startPaymentSession(paymentTransactionLauncher, request);
     }
 ```
 ## Hips Settings
@@ -268,7 +244,7 @@ To make a new payment, create your `HipsTransactionRequest.Payment` body.
 
 #### Payment Requests
 
-Pass your `HipsTransactionRequest.Payment` along with your activity or fragment to `hipsUi.startSession()` to start a new HipsUI Payment session.
+Pass your `HipsTransactionRequest.Payment` along with your activity or fragment to `hipsUi.startPaymentSession()` to start a new HipsUI Payment session.
 ```kotlin
     val hipsTransactionRequest = HipsTransactionRequest.Payment(
                 amountInCents = 100,
@@ -280,10 +256,9 @@ Pass your `HipsTransactionRequest.Payment` along with your activity or fragment 
                 isTestMode = true
             )
 
-    hipsUi.startSession(
-        hipsTransactionRequest = hipsTransactionRequest,
-        requestCode = 12345,
-        fragment = this
+    hipsUi.startPaymentSession(
+        paymentTransactionLauncher = paymentTransactionLauncher,
+        transactionRequest = hipsTransactionRequest,
     )
 ```
 
@@ -343,20 +318,17 @@ Check status for approved or declined transactions in `HipsTransactionResult`, a
 | `tvr`                       | Terminal Verification Result                                                                                                                                                                                                                                                                                    |      |
 | `verificationMethod`        | Transaction CVM                                                                                                                                                                                                                                                                                                 |      |
 ```kotlin
-    
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.Transaction -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsTransactionResult}")
-                    }
-                }
-            }
 
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    // Add Hips Payment Transaction Launcher to handle payment results
+    private val paymentTransactionLauncher = registerForActivityResult(
+        HipsUiPaymentTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiPaymentTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiPaymentTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiPaymentTransactionContractResult.Cancelled -> onCancelled()
         }
-    })
+    }
 ```
 ## Refund Payment
 
@@ -380,24 +352,36 @@ To make a new Refund, create your `HipsTransactionRequest.Refund` body.
 
 #### Refund Requests
 
-Pass your `HipsTransactionRequest.Refund` along with your activity or fragment to `hipsUi.startSession()` to start a new HipsUI Refund session.
+Pass your `HipsTransactionRequest.Refund` along with your activity or fragment to `hipsUi.startRefundSession()` to start a new HipsUI Refund session.
 ```kotlin
     val hipsTransactionRequest = HipsTransactionRequest.Refund(
-                amountInCents = 100,
-                transactionId = "1234567890",
-                isTestMode = true
-            )
-
-    hipsUi.startSession(
-        hipsTransactionRequest = hipsTransactionRequest,
-        requestCode = 12345,
-        fragment = this
+        amountInCents = binding.demoAmount.text.trim().toString().toIntOrNull(),
+        transactionId = "Use a transaction id received from a purchase or pre auth",
+        isTestMode = binding.testSwitch.isChecked
+    )
+    
+    hipsUi.startRefundSession(
+        refundTransactionLauncher = refundTransactionLauncher,
+        transactionRequest = hipsTransactionRequest,
     )
 ```
 
 #### Refund Results
 A Refund session always completes by returning `HipsResult.Transaction`.  
 Check status for approved or declined transactions in `HipsTransactionResult`, all available parameters and results are listed above under Payment.
+```kotlin
+
+    // Add Hips Refund Transaction Launcher to handle refund results
+    private val refundTransactionLauncher = registerForActivityResult(
+        HipsUiRefundTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiRefundTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiRefundTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiRefundTransactionContractResult.Cancelled -> onCancelled()
+        }
+    }
+```
 
 ## Capture Payment
 
@@ -420,54 +404,63 @@ To make a new payment, create your `HipsTransactionRequest.Capture` body.
 
 #### Capture Requests
 
-Pass your `HipsTransactionRequest.Capture` along with your activity or fragment to `hipsUi.startSession()` to start a new HipsUI Payment session.
+Pass your `HipsTransactionRequest.Capture` along with your activity or fragment to `hipsUi.startCaptureSession()` to start a new HipsUI Capture session.
 ```kotlin
     val hipsTransactionRequest = HipsTransactionRequest.Capture(
-                amountInCents = 100,
-                transactionId = "1234567890",
-                isTestMode = true
-            )
-
-    hipsUi.startSession(
-        hipsTransactionRequest = hipsTransactionRequest,
-        requestCode = 12345,
-        fragment = this
+        amountInCents = binding.demoAmount.text.trim().toString().toIntOrNull(),
+        transactionId = "Use a transaction id received from a pre auth",
+        isTestMode = binding.testSwitch.isChecked
+    )
+    
+    hipsUi.startCaptureSession(
+        captureTransactionLauncher = captureTransactionLauncher,
+        transactionRequest = hipsTransactionRequest,
     )
 ```
 
 #### Capture Results
 A Capture session always completes by returning `HipsResult.Transaction`.  
 Check status for approved or declined transactions in `HipsTransactionResult`, all available parameters and results are listed above under Payment.
+```kotlin
 
-## Make Non Payments - Loyalty cards
+    // Add Hips Capture Transaction Launcher to handle capture results
+    private val captureTransactionLauncher = registerForActivityResult(
+        HipsUiCaptureTransactionContract()
+    ) { result ->
+        when (result) {
+            is HipsUiCaptureTransactionContractResult.Transaction -> onResult(result.formatResult())
+            is HipsUiCaptureTransactionContractResult.Error -> onError(result.code, result.message)
+            is HipsUiCaptureTransactionContractResult.Cancelled -> onCancelled()
+        }
+    }
+```
 
-Launch a mag swipe session by calling `hipsUi.startNonPaymentRequest()`. Provide a text string to display on your terminal.
+## Make Loyalty cards reads
+
+Launch a mag swipe session by calling `hipsUi.startLoyaltySession()`. Provide a text string to display on your terminal.
 The SDK interacts by receiving and returning Request and Result types.
-
-
 
 > ### **IMPORTANT!**
 > The BIN (first 6 digits) of the non-payment card that you want to read via this function must be pre-registered as a non-payment BIN. 
 > Non registered BINs will not return any track data. To register a non-payment BIN, please email a proof that this BIN is owned by you to support@hips.com
 
 - Requires: `Default Device`
-- Request: `HipsNonPaymentRequest.MagSwipe`
-- Result: `HipsResult.NonPayment.HipsNonPaymentMagSwipeResult`
+- Request: `HipsLoyaltyCardReadRequest.MagSwipe`
+- Result: `HipsResult.LoyaltyCardRead.HipsLoyaltyCardReadResult`
 
-#### Non Payment Mag Swipe Requests
+#### Loyalty card read Requests
 ```kotlin
-    hipsUi.startNonPaymentRequest(
-        hipsNonPaymentRequest = HipsNonPaymentRequest.MagSwipe(
-            displayText = "Please swipe your bonus card"
+    hipsUi.startLoyaltySession(
+        loyaltyLauncher = loyaltyLauncher,
+        loyaltyRequest = HipsLoyaltyCardReadRequest.MagSwipe(
+            displayText = binding.demoLoyaltyCardReadText.text.trim().toString()
         ),
-        requestCode = 12345,
-        fragment = this
     )
 ```
 
-#### Non Payment Mag Swipe Results
-A payment session always completes by returning `HipsResult.NonPayment`.  
-Check status for approved or declined transactions in `HipsNonPaymentMagSwipeResult`, all available parameters are listed below:
+#### Loyalty card read Results
+A session always completes by returning `HipsResult.LoyaltyCardRead`.  
+Check status for approved or declined transactions in `HipsLoyaltyCardReadResult`, all available parameters are listed below:
 
 | Parameter         | Description                                              | Type |
 |:------------------|:---------------------------------------------------------|:-----|
@@ -480,28 +473,20 @@ Check status for approved or declined transactions in `HipsNonPaymentMagSwipeRes
 | `track3`          | Magnetic Stripe Track 3                                  |      |
 
 ```kotlin
-    
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.NonPayment -> {
-                        when (val nonPaymentResult = hipsResult.hipsNonPaymentResult) {
-                            is HipsNonPaymentResult.MagSwipe -> {
-                                Log.v(TAG, "onResult: ${nonPaymentResult.hipsNonPaymentMagSwipeResult}")
-                            }
-                        }
-                    }
-                }
-            }
-
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    // Add Hips Loyalty Launcher to handle loyalty card results
+    private val loyaltyLauncher = registerForActivityResult(
+        HipsUiLoyaltyContract()
+    ) { result ->
+        when (result) {
+            is HipsUiLoyaltyCardReadContractResult.Success -> onResult(result.formatResult())
+            is HipsUiLoyaltyCardReadContractResult.Error -> onError(result.code, result.message)
+            is HipsUiLoyaltyCardReadContractResult.Cancelled -> onCancelled()
         }
-    })
+    }
 ```
 ## Offline Batch Upload via HipsUI API
 
-Trigger manual offline batch uploads by in invoking `HipsUi.startOfflineBatchUpload()`. This will upload any existing offline transactions stored in the SDK
+Trigger manual offline batch uploads by in invoking `HipsUi.startOfflineBatchUploadSession()`. This will upload any existing offline transactions stored in the SDK
 - Requires: `TerminalApiKeyAuth`
 - Result: `HipsResult.OfflineBatch.HipsOfflineBatchResult`
 
@@ -514,32 +499,27 @@ Trigger manual offline batch uploads by in invoking `HipsUi.startOfflineBatchUpl
 
 #### Trigger Offline Batch Upload
 ```kotlin
-    hipsUi.startOfflineBatchUpload(
-        requestCode = 1345,
-        fragment = this
+    hipsUi.startOfflineBatchUploadSession(
+        offlineBatchUploadLauncher = offlineBatchUploadLauncher
     )
 ```
 #### Offline Batch Upload Results
 ```kotlin
-    
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.OfflineBatch -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsOfflineBatchResult}")
-                    }
-                }
-            }
-
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    // Add Hips Offline batch upload Launcher to handle offline sync results
+    private val offlineBatchUploadLauncher = registerForActivityResult(
+        HipsUiOfflineBatchUploadContract()
+    ) { result ->
+        when (result) {
+            is HipsUiOfflineBatchUploadContractResult.Success -> onResult(result.formatResult())
+            is HipsUiOfflineBatchUploadContractResult.Error -> onError(result.code, result.message)
+            is HipsUiOfflineBatchUploadContractResult.Cancelled -> onCancelled()
         }
-    })
+    }
 ```
 
 ## Terminal Activation via HipsUI API
 
-Launch Activation UI by in invoking `HipsUi.activateTerminal()`. Select a paired device and start the activation process.  Read more about the steps involved in section **Hips Settings - Activate terminal**
+Launch Activation UI by in invoking `HipsUi.startActivateTerminalSession()`. Select a paired device and start the activation process.  Read more about the steps involved in section **Hips Settings - Activate terminal**
 
 - Result: `HipsResult.Activation.HipsActivationResult`
 
@@ -549,32 +529,27 @@ Launch Activation UI by in invoking `HipsUi.activateTerminal()`. Select a paired
 
 #### Trigger Terminal Activation
 ```kotlin
-    hipsUi.activateTerminal(
-        requestCode = 1345,
-        fragment = this
+    hipsUi.startActivateTerminalSession(
+        activateTerminalLauncher = activateTerminalLauncher
     )
 ```
 #### Terminal Activation results
 ```kotlin
-    
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.Activation -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsActivationResult.authToken}")
-                    }
-                }
-            }
-
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    // Add Hips Activate Terminal Launcher to handle activation results
+    private val activateTerminalLauncher = registerForActivityResult(
+        HipsUiActivateTerminalContract()
+    ) { result ->
+        when (result) {
+            is HipsUiActivateTerminalContractResult.Success -> onResult(result.formatResult())
+            is HipsUiActivateTerminalContractResult.Error -> onError(result.code, result.message)
+            is HipsUiActivateTerminalContractResult.Cancelled -> onCancelled()
         }
-    })
+    }
 ```
 
 ## Terminal Parameter Update via HipsUI API
 
-Launch Parameter Update UI by in invoking `HipsUi.updateTerminal()`. The SDK will attempt to connect to your `Default Device`.  Read more about the steps involved in section **Hips Settings - Parameter updates**
+Launch Parameter Update UI by in invoking `HipsUi.startUpdateTerminalSession()`. The SDK will attempt to connect to your `Default Device`. Read more about the steps involved in section **Hips Settings - Parameter updates**
 
 - Requires: `Default Device`, `TerminalApiKeyAuth`
 - Result: `HipsResult.ParamsUpdate.HipsParamsUpdateResult`
@@ -585,27 +560,55 @@ Launch Parameter Update UI by in invoking `HipsUi.updateTerminal()`. The SDK wil
 
 #### Trigger Terminal Parameter Update
 ```kotlin
-    hipsUi.updateTerminal(
-        requestCode = 1345,
-        fragment = this
+    hipsUi.startUpdateTerminalSession(
+        updateTerminalLauncher = updateTerminalLauncher
     )
 ```
 #### Terminal Parameter Update results
 ```kotlin
-    
-    hipsUi.registerCallback(callbackManager, object : HipsUiCallback<HipsResult> {
-            override fun onResult(hipsResult: HipsResult) {
-                when (hipsResult) {
-                    is HipsResult.ParamsUpdate -> {
-                        Log.v(TAG, "onResult: ${hipsResult.hipsParamsUpdateResult.isSuccessful}")
-                    }
-                }
-            }
-
-        override fun onError(errorCode: String, errorMessage: String?) {
-            hipsTransactionResultText.text = "$errorCode: $errorMessage"
+    private val updateTerminalLauncher = registerForActivityResult(
+        HipsUiUpdateTerminalContract()
+    ) { result ->
+        when (result) {
+            is HipsUiUpdateTerminalContractResult.Success -> onResult(result.formatResult())
+            is HipsUiUpdateTerminalContractResult.Error -> onError(result.code, result.message)
+            is HipsUiUpdateTerminalContractResult.Cancelled -> onCancelled()
         }
-    })
+    }
+```
+
+#### Customize the Hips UI theme
+```kotlin
+class MainApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+
+        hipsUi = HipsUiBuilder()
+            .appContext(this)
+            .build()
+
+        // Apply custom UI elements to Hips SDK such as colors and icons
+        customizeSDK()
+    }
+
+
+    /**
+     * As for colors, pass only resolved colors (ColorInt): ContextCompat.getColor() or Color objects
+     */
+    private fun customizeSDK() {
+        val customTheme = hipsUi.themeOptions
+        customTheme.toolbarColor = ContextCompat.getColor(this, R.color.custom_toolbar_bg)
+        customTheme.toolbarTextColor = ContextCompat.getColor(this, R.color.custom_accent)
+        customTheme.toolbarLogoDrawable = ContextCompat.getDrawable(this, R.drawable.custom_logo)
+        customTheme.backgroundColor = ContextCompat.getColor(this, R.color.custom_main_bg)
+        customTheme.paymentStatusTextColor = ContextCompat.getColor(this, R.color.custom_accent)
+        customTheme.paymentSummaryTextColor = ContextCompat.getColor(this, R.color.custom_accent)
+        customTheme.paymentStatusProgressColor = ContextCompat.getColor(this, R.color.custom_accent)
+        customTheme.paymentStatusDebugLogTextColor = ContextCompat.getColor(this, R.color.custom_accent)
+    }
+}
+
 ```
 
 ## Response, Decline and Error Codes
