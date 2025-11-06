@@ -2,16 +2,17 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace "com.hips.sdk.android.hipsmposdemo"
     signingConfigs {
         release {
         }
     }
-    compileSdkVersion 32
+    compileSdkVersion 36
 
     defaultConfig {
         applicationId "com.hips.sdk.android.hipsmposdemo"
-        minSdkVersion 21
-        targetSdkVersion 32
+        minSdkVersion 26
+        targetSdkVersion 36
         versionCode 1
         versionName "1.0"
 
@@ -27,13 +28,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     buildFeatures {
         viewBinding = true
     }
+}
+
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
