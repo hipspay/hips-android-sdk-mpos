@@ -1,4 +1,4 @@
-# Hips UI Android SDK 1.3.1
+# Hips UI Android SDK 1.4.0
 Hips Android SDK is a library that provides the native In-App interaction of performing the Hips MPOS payment directly from an app on the Android device.
 
 # Project Status
@@ -35,15 +35,16 @@ Supported features
 - Customize the Hips UI SDK theme 
 
 #### Change log
-| Version | Description                                                                                                                          | Date       |
-|:--------|:-------------------------------------------------------------------------------------------------------------------------------------|:-----------|
-| `1.3.1` | Fixed cancellation issue when aborting a tip flow | 2022-07-19 |
+| Version | Description                                                                                                                                                                                                                                                                                                                                                                                                               | Date       |
+|:--------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------|
+| `1.4.0` | Updated compileSdk & targetSdk to 36. Upgraded to latest Android Gradle Plugin and Kotlin. Migrated project to Java 11 compatibility                                                                                                                                                                                                                                                                                      | 2025-11-06 |
+| `1.3.1` | Fixed cancellation issue when aborting a tip flow                                                                                                                                                                                                                                                                                                                                                                         | 2022-07-19 |
 | `1.3.0` | Added new Launch contracts to retrieve results from Hips UI SDK. The previous API is still available but is marked with deprecation and will be removed in future releases. Its highly recommended to implement the new API to avoid some Lifecycle related issues. Added theming support to customize the payment and loyalty views. SDK targets latest API 32. Fixed an issue where a cancellation could cause a crash. | 2022-07-15 |
-| `1.2.4` | Added new TipFlow type, ´ASK_WITH_CENTS´. Fixed cancellation issue in payment flow. Added minor UI improvement                       | 2021-03-18 |
-| `1.2.0` | Re-ordered activation flow.                                                                                                          | 2021-02-25 |
-| `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal() | 2021-02-17 |
-| `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI`                                                          | 2021-02-05 |
-| `1.0.1` | Offline payment hotfix                                                                                                               | 2021-01-29 |
+| `1.2.4` | Added new TipFlow type, ´ASK_WITH_CENTS´. Fixed cancellation issue in payment flow. Added minor UI improvement                                                                                                                                                                                                                                                                                                            | 2021-03-18 |
+| `1.2.0` | Re-ordered activation flow.                                                                                                                                                                                                                                                                                                                                                                                               | 2021-02-25 |
+| `1.1.2` | Added `cardFingerprint` property to HipsTransactionResult. Added new SDK specific error codes. Fixed named var in activateTerminal()                                                                                                                                                                                                                                                                                      | 2021-02-17 |
+| `1.1.0` | Added offline upload, terminal activation and param update APIs in `HipsUI`                                                                                                                                                                                                                                                                                                                                               | 2021-02-05 |
+| `1.0.1` | Offline payment hotfix                                                                                                                                                                                                                                                                                                                                                                                                    | 2021-01-29 |
 
 # Demo app
 ----
@@ -88,11 +89,6 @@ allprojects {
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-core:LATEST-VERSION'
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-ui:LATEST-VERSION'
     implementation 'org.bitbucket.hipspay.hips-android-sdk-mpos:hips-terminal-miura:LATEST-VERSION'
-```
-## Proguard
-If any code obfuscation is set, add rules to keep Hips files excluded.
-```
--keep class com.hips.** { *; }
 ```
 
 ## Kotlin

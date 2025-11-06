@@ -31,7 +31,7 @@ class MainApplication : Application() {
         val customTheme = hipsUi.themeOptions
         customTheme.toolbarColor = ContextCompat.getColor(this, R.color.custom_toolbar_bg)
         customTheme.toolbarTextColor = ContextCompat.getColor(this, R.color.custom_accent)
-        customTheme.toolbarLogoDrawable = ContextCompat.getDrawable(this, R.drawable.logo_hips_white)
+        customTheme.toolbarLogoDrawable = ContextCompat.getDrawable(this, com.hips.sdk.hips.ui.R.drawable.logo_hips_white)
         customTheme.backgroundColor = ContextCompat.getColor(this, R.color.custom_main_bg)
         customTheme.paymentStatusTextColor = ContextCompat.getColor(this, R.color.custom_accent)
         customTheme.paymentSummaryTextColor = ContextCompat.getColor(this, R.color.custom_accent)
